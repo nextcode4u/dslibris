@@ -69,7 +69,17 @@ def main():
     header.write_text(text)
     file_source = pdfio / 'pdfio-file.c'
     file_source.write_text(re.sub(r'(?:\(uint64_t\))*obj->offset >>', '((uint64_t)obj->offset) >>', file_source.read_text()))
+    # Text-only reader: skip reconstruction/decompression of embedded media/fonts.
+    # The caller disables links/OPF reconstruction, so these resources are unused.
+    mobi_parser = sources['mobi'] / 'src/parse_rawml.c'
+    parser_text = mobi_parser.read_text()
+    original = 'ret = mobi_reconstruct_resources(m, rawml);'
+    adapted = 'ret = MOBI_SUCCESS; /* DSLibris: text-only, skip media resources. */'
+    if original not in parser_text and adapted not in parser_text:
+        raise RuntimeError('libmobi text-only adaptation no longer matches')
+    mobi_parser.write_text(parser_text.replace(original, adapted))
     units = {
+        'mobi': [sources['mobi'] / 'src' / (name + '.c') for name in ('buffer', 'compression', 'debug', 'index', 'memory', 'meta', 'parse_rawml', 'read', 'structure', 'util', 'write')],
         'expat': [expat / 'lib' / (name + '.c') for name in ('xcs', 'xmlparse', 'xmlrole', 'xmltok')],
         'md4c': [sources['md4c'] / 'src' / name for name in ('md4c.c', 'entity.c')],
         'pdfio': sorted(pdfio.glob('pdfio-*.c')) + [pdfio / 'ttf.c', ROOT / 'ports/pdfio_compat.c'],
@@ -95,7 +105,7 @@ def main():
     end = example.index('\n};', example.index('static name_map_t', start)) + 3
     glyphs = example[start:end].replace('static name_map_t', 'static const name_map_t')
     (includes / 'pdfio_glyph_names.h').write_text('// Derived from PDFio pdf2text.c; Copyright 2022-2025 Michael R Sweet.\n// Apache-2.0; see build/deps/licenses/pdfio-LICENSE and pdfio-NOTICE.\n' + glyphs + '\n')
-    headers = [expat / 'lib/expat.h', expat / 'lib/expat_external.h', sources['md4c'] / 'src/md4c.h', sources['md4c'] / 'src/entity.h', pdfio / 'pdfio.h']
+    headers = [sources['mobi'] / 'src/mobi.h', expat / 'lib/expat.h', expat / 'lib/expat_external.h', sources['md4c'] / 'src/md4c.h', sources['md4c'] / 'src/entity.h', pdfio / 'pdfio.h']
     headers += [sources['zlib'] / 'contrib/minizip' / name for name in ('ioapi.h', 'unzip.h', 'ints.h')]
     for header in headers:
         shutil.copyfile(header, includes / header.name)

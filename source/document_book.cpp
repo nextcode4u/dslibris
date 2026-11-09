@@ -31,6 +31,11 @@ int document_open_book(Book *book, const char *path)
     document::Limits limits{dsi ? 8u*1024*1024 : 2u*1024*1024,
                             dsi ? 2u*1024*1024 : 384u*1024, dsi ? 4096u : 1024u};
     if (book->format == FORMAT_MARKDOWN) limits.input_bytes = dsi ? 1024*1024 : 256*1024;
+    // libmobi keeps record data and reconstructed markup in memory simultaneously.
+    if (book->format == FORMAT_MOBI) {
+        limits.input_bytes = dsi ? 1024*1024 : 256*1024;
+        limits.output_bytes = dsi ? 2*1024*1024 : 384*1024;
+    }
     unsigned height = text->GetHeight();
     unsigned step = height * std::max(1, text->linespacing);
     int width = text->display.width - text->margin.left - text->margin.right;
@@ -39,7 +44,8 @@ int document_open_book(Book *book, const char *path)
     BookOutput output(book);
     document::Layout layout(output, width, remaining / step + 1, limits);
     int status;
-    if (book->format == FORMAT_PDF) status = document::read_pdf(path, layout, limits);
+    if (book->format == FORMAT_MOBI) status = document::read_mobi(path, layout, limits);
+    else if (book->format == FORMAT_PDF) status = document::read_pdf(path, layout, limits);
     else if (book->format == FORMAT_FB2 || book->format == FORMAT_FB2_ZIP
              || book->format == FORMAT_DOCX || book->format == FORMAT_ODT)
         status = document::read_xml_book(path, book->format, layout, limits);

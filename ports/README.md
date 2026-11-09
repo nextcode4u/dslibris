@@ -10,6 +10,7 @@ tests. No dependency binaries or download archives are checked in.
 | [Expat 2.10.0](https://github.com/libexpat/libexpat/tree/R_2_10_0) | EPUB and preferences XML | MIT, upstream `COPYING` |
 | [MD4C 0.6.0](https://github.com/mity/md4c/tree/v0.6.0) | CommonMark parsing and named HTML entities | MIT, upstream `LICENSE.md` |
 | [PDFio 1.6.6](https://github.com/michaelrsweet/pdfio/tree/v1.6.6) | PDF objects, compression and text streams | Apache-2.0, upstream `LICENSE` and `NOTICE`, including its GPLv2 combination exception |
+| [libmobi 0.12](https://github.com/bfabiszewski/libmobi/tree/v0.12) | PalmDOC, MOBI and KF8 text/decompression | LGPL-3.0-or-later, upstream `COPYING` and `AUTHORS` |
 | [zlib/MiniZip 1.3.2](https://github.com/madler/zlib/tree/v1.3.2) | Headers for upstream's existing MiniZip source | zlib/MiniZip notices |
 
 FreeType 2.14.3, zlib 1.3.2 and libpng 1.6.59 were supplied by Wonderful packages
@@ -18,7 +19,7 @@ only by the unchanged devkitARM build, not by `Makefile.blocksds`.
 
 The script copies dependency notices into `build/deps/licenses/` (or the host
 counterpart). A binary distributor must include those notices, the reader's GPL
-and fork notices, and the toolchain/FreeType/zlib/libpng notices, and provide the
+and fork notices (including [GPLv3](../COPYING.GPL3) for the BlocksDS combined build), and the toolchain/FreeType/zlib/libpng notices, and provide the
 corresponding reader source under its GPL terms. Source downloads and generated
 headers remain available in the build directory for inspection.
 
@@ -46,3 +47,21 @@ Expat receives a small little-endian configuration. The DS has no OS entropy
 provider, so it uses Expat's documented `XML_POOR_ENTROPY` fallback. No external
 entity resolver is installed. This reader is intended for local documents; this
 configuration is not a hardened network XML service.
+
+## Mobipocket text-only build
+
+libmobi is built without encryption support or XML/OPF writing. The script skips
+`mobi_reconstruct_resources()` in its downloaded `parse_rawml.c`: this reader does
+not need decompressed images, audio or embedded fonts. KF8 skeleton/fragment
+reconstruction remains enabled; TOC, dictionary and link reconstruction are disabled
+at the call site. The exact source archive/hash and this repeatable adaptation are
+part of the build recipe. No upstream library source is replaced in the repository.
+
+libmobi retains LGPL-3.0-or-later. The original reader grants GPL-2.0-or-later;
+the combined BlocksDS executable uses that later-version option under
+GPL-3.0-or-later. Preserve both original notices and dependency notices. Distributing
+a static binary also requires corresponding source/build materials sufficient to
+rebuild and relink it, including these dependency sources and adaptations; a source
+URL alone is not a substitute for fulfilling those terms. The checksum-pinned
+script prepares those sources locally. The legacy EPUB-only target does not link
+libmobi. New adapter files retain their separate MIT grant.

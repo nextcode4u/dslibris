@@ -51,6 +51,7 @@ class Html {
     std::vector<Frame> stack;
     bool bold = false, italic = false, literal = false, hidden = false;
     bool content = false;
+    bool honor_charset;
     int32_t held = -1;
     int error = Ok;
     std::string raw_name;
@@ -76,6 +77,7 @@ class Html {
         return true;
     }
     bool charset(const std::string &name) {
+        if (!honor_charset) return true;
         std::string value = lower(name);
         if (value.empty()) return true;
         if (value == "utf-8" || value == "utf8" || value == "us-ascii") return input.set_encoding(Encoding::Utf8);
@@ -133,7 +135,7 @@ class Html {
         return true;
     }
 public:
-    Html(TextInput &input, Sink &sink) : input(input), sink(sink) {}
+    Html(TextInput &input, Sink &sink, bool honor_charset = true) : input(input), sink(sink), honor_charset(honor_charset) {}
     int run() {
         for (int32_t c; (c = next()) >= 0;) {
             if (!raw_name.empty()) {
@@ -210,7 +212,7 @@ int read_html(FILE *file, Sink &sink, Limits limits)
 int read_html_data(const char *data, size_t size, Sink &sink, Limits limits, Encoding encoding)
 {
     TextInput input(data, size, limits.input_bytes, encoding);
-    return Html(input, sink).run();
+    return Html(input, sink, false).run();
 }
 }
 #endif

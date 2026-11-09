@@ -18,7 +18,7 @@ ebook reader for the Nintendo DS.
 This is nextcode4u's fork of [rhaleblian/dslibris](https://github.com/rhaleblian/dslibris).
 The original reader and its two-screen design are the work of the upstream authors.
 Fork additions provide launcher arguments, a current BlocksDS build, and TXT,
-Markdown, reflowed PDF, HTML/XHTML, FictionBook, RTF, DOCX and ODT text alongside EPUB.
+Markdown, reflowed PDF, HTML/XHTML, FictionBook, RTF, DOCX, ODT, PalmDOC and DRM-free Mobipocket/Kindle text alongside EPUB.
 
 - [Document formats and limits](DOCUMENT_FORMATS.md)
 - [Launcher arguments and upstream merges](ARGUMENT_LAUNCH.md)
@@ -35,7 +35,7 @@ make -f Makefile.blocksds -j4
 ```
 
 Python 3.9+ is required. The first build downloads checksum-pinned Expat, MD4C,
-PDFio and MiniZip headers, then builds the required libraries under ignored
+PDFio, libmobi and MiniZip headers, then builds the required libraries under ignored
 `build/deps/`. SDK paths default to `/opt/blocksds/core` and `/opt/wonderful`; override
 `BLOCKSDS` and `WONDERFUL_TOOLCHAIN` for another installation. On Windows, use WSL
 or a supported BlocksDS development environment.
@@ -53,7 +53,10 @@ and DS-mode emulator checks are described in the document guide.
 ### Licensing
 
 The original application remains GPL-2.0-or-later; [COPYING](COPYING) contains the
-GPLv2 text. New integration files have the limited MIT grant in
+GPLv2 text. The BlocksDS binary links LGPL-3.0-or-later libmobi and uses the
+original application’s later-version option to combine under GPL-3.0-or-later;
+[COPYING.GPL3](COPYING.GPL3) supplies that text. This does not remove the original
+GPL-2.0-or-later grant from upstream files or the EPUB-only build. New integration files have the limited MIT grant in
 [ARGUMENT_LAUNCH_LICENSE.md](ARGUMENT_LAUNCH_LICENSE.md). Dependencies retain their
 own terms and notices; PDFio's GPLv2 combination exception is preserved. Include
 the required licenses and corresponding source information with any binary release.

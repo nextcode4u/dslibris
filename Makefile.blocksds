@@ -10,7 +10,7 @@ GAME_ICON := gfx/icon.bmp
 SOURCEDIRS := source gfx
 INCLUDEDIRS := include build/deps/include $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/arm-none-eabi/include/freetype2
 LIBDIRS := build/deps
-LIBS := -lfreetype -lpng16 -lexpat -lmd4c -lpdfio -lz -lnds9
+LIBS := -lfreetype -lpng16 -lexpat -lmd4c -lpdfio -lmobi -lz -lnds9
 DEFINES := -DIOAPI_NO_64 -DDSL_DOCUMENTS
 CFLAGS := -std=gnu11
 CXXFLAGS := -std=gnu++17

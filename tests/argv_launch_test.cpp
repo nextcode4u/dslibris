@@ -24,7 +24,7 @@ int main() {
     assert(app.bookdir == root);
     unlink(path);
     const char *extra[] = {"Notes.TXT", "Book.md", "Book.Markdown", "Paper.PDF", "Page.HTML", "Page.xhtml", "Book.FB2", "Book.FB2.ZIP",
-                           "Book.fbz", "Book.RTF", "Book.DOCX", "Book.ODT"};
+                           "Book.fbz", "Book.RTF", "Book.DOCX", "Book.ODT", "Book.PDB", "Book.PRC", "Book.MOBI", "Book.AZW", "Book.AZW3"};
     for (const char *filename : extra) {
         snprintf(path, sizeof(path), "%s/%s", root, filename);
         file = fopen(path, "wb"); assert(file); fputs("Synthetic fixture", file); fclose(file);

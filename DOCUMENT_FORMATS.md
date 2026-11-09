@@ -14,6 +14,7 @@ case-insensitive; directory names resembling books are skipped.
 | `.html`, `.htm`, `.xhtml` | Local text, headings, basic emphasis, lists, code blocks and HTML entities |
 | `.fb2`, `.fb2.zip`, `.fbz` | FictionBook body text, headings, emphasis, verse and notes; ZIP stays in memory |
 | `.rtf` | Rich Text Format paragraphs, direct bold/italic, Unicode and Windows-1252/1251 text |
+| `.pdb`, `.prc`, `.mobi`, `.azw`, `.azw3` | PalmDOC or unencrypted Mobipocket/KF8 text, selected by container contents |
 | `.docx`, `.odt` | Main document text and simple table rows from the Office/OpenDocument ZIP |
 
 For example, a launcher can pass `sd:/media/Books/Notes.md` or
@@ -70,6 +71,26 @@ entries; decoded XML also has the normal input-byte limit. HTML tags are capped
 at 4 KiB and nesting at 128, while comments and text are streamed. RTF nesting is
 capped at 128. No DTD or external XML entity resolver is enabled.
 
+## PalmDOC and Mobipocket/Kindle
+
+libmobi decodes uncompressed, PalmDOC-compressed and Huff/CDIC-compressed text.
+PalmDOC (`TEXt/REAd`) uses Windows-1252; MOBI uses its declared UTF-8 or Windows-1252.
+KF8 reconstructs the HTML skeleton/fragment stream before text reflow. Dual-format
+books use libmobi's KF8 selection. Images, CSS, embedded fonts, multimedia, original
+page layout, interactive links and dictionary lookups are not provided. Library
+labels use the filename. PDB/PRC are containers, so unrelated Palm applications or
+ebook encodings are not accepted just because their extension matches.
+
+DRM/encrypted books are rejected; no keys or decryption code are included. Kindle
+KFX, Print Replica/AZW4, DjVu, CBZ/CBR, binary DOC, CHM and DRM-protected EPUB are
+not new supported formats. Convert these to an unprotected, supported text format
+first; image-only books need a different image/page renderer.
+
+The record table is checked before loading; at most 4096 records are accepted.
+Compressed records and reconstructed text coexist in memory, so these formats
+use tighter file limits. Reconstructed raw text is capped at twice the page-data
+budget, up to 2 MiB, and actual allocations can still fail below those limits.
+
 ## PDF scope
 
 PDFio reads the PDF structure and decoded streams. The reader extracts text from
@@ -90,6 +111,7 @@ Limits prevent silently truncating a document:
 | Bound | DS | DSi |
 | --- | --- | --- |
 | Text/PDF/HTML/XML/RTF input bytes | 2 MiB | 8 MiB |
+| PalmDOC/MOBI compressed file | 256 KiB | 1 MiB |
 | Markdown source (loaded for MD4C) | 256 KiB | 1 MiB |
 | Generated page data | 384 KiB | 2 MiB |
 | Reader page count | 1024 | 4096 |
@@ -125,7 +147,8 @@ The document tests build native dependency copies when needed and generate origi
 PDF fixtures locally. They check TXT newlines, malformed UTF-8, long words, page and
 style boundaries, Markdown, compressed and split PDF streams, font encodings,
 Unicode ranges/ligatures, nested Forms, HTML/RTF text, FB2 and office ZIPs,
-Unicode encodings, entity/DTD handling, CRC checks, limits and failure cases. Reader code runs
+Unicode encodings, entity/DTD handling, CRC checks, PalmDOC/MOBI compression,
+legacy encodings, encrypted-file rejection, limits and failure cases. Reader code runs
 under AddressSanitizer/UndefinedBehaviorSanitizer; third-party libraries use their
 normal builds. These are not physical-hardware tests.
 

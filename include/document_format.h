@@ -3,7 +3,7 @@
 #include <string.h>
 #include <strings.h>
 
-enum format_t { FORMAT_UNDEF, FORMAT_XHTML, FORMAT_EPUB, FORMAT_TEXT, FORMAT_MARKDOWN, FORMAT_PDF, FORMAT_FB2, FORMAT_FB2_ZIP, FORMAT_RTF, FORMAT_DOCX, FORMAT_ODT };
+enum format_t { FORMAT_UNDEF, FORMAT_XHTML, FORMAT_EPUB, FORMAT_TEXT, FORMAT_MARKDOWN, FORMAT_PDF, FORMAT_FB2, FORMAT_FB2_ZIP, FORMAT_RTF, FORMAT_DOCX, FORMAT_ODT, FORMAT_MOBI };
 
 static inline format_t document_format(const char *filename)
 {
@@ -24,6 +24,8 @@ static inline format_t document_format(const char *filename)
     if (!strcasecmp(ext, ".rtf")) return FORMAT_RTF;
     if (!strcasecmp(ext, ".docx")) return FORMAT_DOCX;
     if (!strcasecmp(ext, ".odt")) return FORMAT_ODT;
+    if (!strcasecmp(ext, ".mobi") || !strcasecmp(ext, ".prc") || !strcasecmp(ext, ".pdb")
+        || !strcasecmp(ext, ".azw") || !strcasecmp(ext, ".azw3")) return FORMAT_MOBI;
 
 #endif
     return FORMAT_UNDEF;

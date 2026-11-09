@@ -6,10 +6,9 @@
 #include <string>
 
 namespace document {
-int read_text(FILE *file, Sink &sink, Limits limits)
+static int read_decoded_text(TextInput &input, Sink &sink)
 {
     if (!sink.preformatted(true)) return LayoutError;
-    TextInput input(file, limits.input_bytes);
     std::string chunk;
     bool carriage_return = false;
     for (int32_t code; (code = input.next()) >= 0;) {
@@ -25,5 +24,16 @@ int read_text(FILE *file, Sink &sink, Limits limits)
     if (input.status()) return input.status();
     return sink.text(chunk.data(), chunk.size()) ? Ok : LayoutError;
 }
+int read_text(FILE *file, Sink &sink, Limits limits)
+{
+    TextInput input(file, limits.input_bytes);
+    return read_decoded_text(input, sink);
+}
+int read_text_data(const char *data, size_t size, Sink &sink, Limits limits, Encoding encoding)
+{
+    TextInput input(data, size, limits.input_bytes, encoding);
+    return read_decoded_text(input, sink);
+}
+
 }
 #endif
