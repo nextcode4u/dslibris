@@ -36,3 +36,22 @@ static inline size_t utf8_encode(uint32_t code, char out[4])
     out[0] = (char)(0xf0 | (code >> 18)); out[1] = (char)(0x80 | ((code >> 12) & 63));
     out[2] = (char)(0x80 | ((code >> 6) & 63)); out[3] = (char)(0x80 | (code & 63)); return 4;
 }
+
+#ifdef __cplusplus
+// Return a byte boundary that fits the requested width, never half a codepoint.
+template <class Advance>
+size_t utf8_prefix_width(const char *text, size_t length, unsigned pixels, Advance advance)
+{
+    size_t used = 0;
+    unsigned width = 0;
+    while (used < length) {
+        uint32_t code;
+        size_t bytes = utf8_decode(text + used, length - used, &code);
+        unsigned next = advance(code);
+        if (next > pixels - width) break;
+        width += next;
+        used += bytes;
+    }
+    return used;
+}
+#endif

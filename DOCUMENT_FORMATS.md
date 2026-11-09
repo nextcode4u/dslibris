@@ -8,7 +8,7 @@ case-insensitive; directory names resembling books are skipped.
 | Files | Reading behavior |
 | --- | --- |
 | `.epub` | Original EPUB loader, metadata and book indexing |
-| `.txt` | UTF-8 text, optional UTF-8 BOM, CR/LF/CRLF newlines, blank lines and tab indentation |
+| `.txt` | UTF-8 and BOM-marked UTF-16LE/BE text, CR/LF/CRLF newlines, blank lines and tab indentation |
 | `.md`, `.markdown` | CommonMark text, headings, bold/italic, lists, code blocks, link labels, image alt text and simple table text |
 | `.pdf` | Extracted text reflowed into reader pages; no original page layout or image rendering |
 
@@ -20,8 +20,8 @@ See [ARGUMENT_LAUNCH.md](ARGUMENT_LAUNCH.md) for the existing mount/path behavio
 ## TXT and Markdown
 
 TXT preserves explicit line breaks and wraps long lines/words to the screen.
-It does not autodetect legacy code pages or UTF-16. Invalid UTF-8 is replaced with
-a replacement character; input bytes cannot inject the reader's formatting controls.
+A BOM selects UTF-16LE/BE; otherwise the input is UTF-8. Legacy code pages are
+not guessed. Invalid Unicode is replaced with a replacement character; input bytes cannot inject the reader's formatting controls.
 
 Markdown uses MD4C. Links display their labels and images display alt text;
 there is no web browser, image loader or syntax highlighting. Fenced code preserves

@@ -14,6 +14,11 @@ int main()
     }
     const char *invalid[] = {"\xc0\xaf", "\xed\xa0\x80", "\xf4\x90\x80\x80", "\xff", "\xe2x"};
     for (auto bytes : invalid) { uint32_t code; assert(utf8_decode(bytes, strlen(bytes), &code) == 1 && code == 0xfffd); }
+    auto width = [](uint32_t) { return 1u; };
+    const char title[] = "A\xc3\xa9\xf0\x9f\x8c\x99";
+    assert(utf8_prefix_width(title, sizeof(title)-1, 1, width) == 1);
+    assert(utf8_prefix_width(title, sizeof(title)-1, 2, width) == 3);
+    assert(utf8_prefix_width(title, sizeof(title)-1, 3, width) == 7);
     uint32_t code; assert(utf8_decode(nullptr, 0, &code) == 0);
     // Exact-sized byte arrays exercise the old page decoder's missing terminator case.
     char truncated[] = {(char)0xf0};

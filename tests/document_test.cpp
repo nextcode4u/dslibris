@@ -44,6 +44,27 @@ int main(int argc, char **argv)
     Pages controls; document::Layout safe(controls, 60, 4, limits);
     assert(safe.text("safe\2text\0", 10)); assert(!safe.finish());
     assert(joined(controls) == "safetext");
+    for (bool big_endian : {false, true}) {
+        std::u16string units = u"\ufeffAé\n🌙";
+        std::string encoded;
+        for (char16_t unit : units) {
+            encoded += (char)(big_endian ? unit >> 8 : unit & 255);
+            encoded += (char)(big_endian ? unit & 255 : unit >> 8);
+        }
+        Capture decoded;
+        f = file(encoded);
+        assert(!document::read_text(f, decoded, limits)); fclose(f);
+        assert(decoded.value == "Aé\n🌙");
+    }
+    Capture malformed;
+    f = file(std::string("\xff\xfe" "A", 3));
+    assert(document::read_text(f, malformed, limits) == document::Invalid); fclose(f);
+    Pages exact;
+    document::Layout exact_style(exact, 2, 1, limits);
+    assert(exact_style.style(true, true));
+    assert(exact_style.text("ab\ncd\n", 6));
+    assert(exact_style.style(false, false));
+    assert(!exact_style.finish() && exact.pages.size() == 1);
     Pages long_word;
     document::Layout wrapped(long_word, 10, 2, limits);
     std::string word(10000, 'a'); assert(wrapped.text(word.data(), word.size()));

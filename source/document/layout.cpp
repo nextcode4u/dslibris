@@ -22,11 +22,12 @@ bool Layout::append(const char *data, size_t length)
 
 bool Layout::save_page()
 {
-    if (buffer.empty()) return true;
+    if (!page_visible) { buffer.clear(); return true; }
     if (pages >= limits.pages) { error = TooLarge; return false; }
     if (!output.page(buffer.data(), buffer.size())) { error = LayoutError; return false; }
     ++pages;
     buffer.clear();
+    page_visible = false;
     return true;
 }
 
@@ -37,7 +38,7 @@ bool Layout::glyph(uint32_t code)
     char bytes[4];
     if (!append(bytes, utf8_encode(code, bytes))) return false;
     used += advance;
-    if (code != ' ') visible = true;
+    if (code != ' ') visible = page_visible = true;
     return true;
 }
 

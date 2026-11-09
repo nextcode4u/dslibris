@@ -46,7 +46,7 @@ private:
     Limits limits;
     unsigned width, lines_per_page, line = 0, used = 0;
     size_t total = 0, pages = 0;
-    bool bold = false, italic = false, literal = false, space = false, visible = false;
+    bool bold = false, italic = false, literal = false, space = false, visible = false, page_visible = false;
     int error = Ok;
     std::string buffer, word;
     bool append(const char *data, size_t length);

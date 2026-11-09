@@ -147,35 +147,32 @@ FT_Error Text::InitFreeTypeCache(void) {
 	return 0;
 }
 
-FT_Error Text::CreateFace(int style) {
-	std::string path = app->fontdir + "/" + filenames[style];
-	error = FT_New_Face(library, path.c_str(), 0, &faces[style]);
-	if (error) halt(path.c_str());
-	
-	error = FT_Select_Charmap(faces[style], FT_ENCODING_UNICODE);
-	if (error) halt("error selecting charmap");
+FT_Error Text::CreateFace(int style)
+{
+    std::string path = app->fontdir + "/" + filenames[style];
+    FT_Face replacement = nullptr;
+    FT_Error result = FT_New_Face(library, path.c_str(), 0, &replacement);
+    if (result) return result;
+    result = FT_Select_Charmap(replacement, FT_ENCODING_UNICODE);
+    if (!result) result = FT_Set_Pixel_Sizes(replacement, 0,
+        style == TEXT_STYLE_BROWSER ? 12 : pixelsize);
+    if (result) { FT_Done_Face(replacement); return result; }
 
-	auto size = pixelsize;
-	if (style == TEXT_STYLE_BROWSER) size = 12;
-
-#ifdef REQUEST_SIZE
-	// This may provide more accurate sizeing.
-	FT_Size_RequestRec request {
-		.type = FT_SIZE_REQUEST_TYPE_NOMINAL,
-		.width = size << 6,   // 26.6 points
-		.height = size << 6,  // 26.6 points
-		.horiResolution = 72 << 6, // 72 dpi
-		.vertResolution = 72 << 6  // 72 dpi
-	};
-	FT_Request_Size(face, &request);
-#else
-	error = FT_Set_Pixel_Sizes(faces[style], 0, size);
-	if (error) halt("error setting pixel size");
-#endif
-
-	textCache.insert(std::make_pair(faces[style], new Cache()));
-
-	return error;
+    // Keep the previous working face until the replacement is fully initialized.
+    auto previous = faces.find(style);
+    if (previous != faces.end()) {
+        FT_Face old = previous->second;
+        ClearCache(old);
+        auto cache_entry = textCache.find(old);
+        if (cache_entry != textCache.end()) {
+            delete cache_entry->second;
+            textCache.erase(cache_entry);
+        }
+        FT_Done_Face(old);
+    }
+    faces[style] = replacement;
+    textCache.emplace(replacement, new Cache());
+    return 0;
 }
 
 int Text::InitCache(void) {
@@ -314,6 +311,7 @@ void Text::ClearCache(u8 style)
 
 void Text::ClearCache(FT_Face face)
 {
+    if (textCache.find(face) == textCache.end()) return;
 	for(std::map<u32, FT_GlyphSlot>::iterator iter = textCache[face]->cacheMap.begin();
 		iter != textCache[face]->cacheMap.end();
 		iter++) {
@@ -342,15 +340,15 @@ void Text::ClearRect(u16 xl, u16 yl, u16 xh, u16 yh)
 	}
 }
 
-u8 Text::GetStringWidth(const char *txt, u8 style)
+unsigned Text::GetStringWidth(const char *txt, u8 style)
 {
 	return GetStringWidth(txt, GetFace(style));
 }
 
-u8 Text::GetStringWidth(const char *txt, FT_Face face)
+unsigned Text::GetStringWidth(const char *txt, FT_Face face)
 {
 	//! Return total advance in pixels.
-	u8 width = 0;
+	unsigned width = 0;
 	const char *c;
 	for(c = txt; *c;)
 	{
@@ -362,19 +360,10 @@ u8 Text::GetStringWidth(const char *txt, FT_Face face)
 	return width;
 }
 
-u8 Text::GetCharCountInsideWidth(const char *txt, u8 style, u8 pixels) {
-	u8 n = 0;
-	u32 ucs = 0;
-	u8 width = 0;
-	for(const char *c = txt; *c != 0 && n <= strlen(txt);)
-	{
-		c += GetCharCode(c, &ucs);
-		if (ucs == 0) continue;
-		width += GetAdvance(ucs, faces[style]);
-		if (width > pixels) return n;
-		n++;
-	}
-	return n;
+size_t Text::GetCharCountInsideWidth(const char *txt, u8 style, u8 pixels)
+{
+    return utf8_prefix_width(txt, strlen(txt), pixels,
+        [this, style](uint32_t code) { return GetAdvance(code, faces[style]); });
 }
 
 u8 Text::GetCharCode(const char *utf8, u32 *ucs) {
@@ -683,8 +672,9 @@ void Text::PrintSplash(u16 *screen)
 void Text::SetFontFile(const char *path, u8 style)
 {
 	if (!strcmp(filenames[style].c_str(), path)) return;
-	filenames[style] = std::string(path);
-	CreateFace(style);
+	std::string previous = filenames[style];
+	filenames[style] = path;
+	if (CreateFace(style)) filenames[style] = previous;
 }
 
 std::string Text::GetFontFile(u8 style)

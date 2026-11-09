@@ -106,7 +106,7 @@ void Button::Draw(u16 *screen, bool highlight) {
 	
 	if (text1.length()) {
 		ts->SetPen(ul.x+6, ul.y+ts->GetHeight());
-		u8 len = ts->GetCharCountInsideWidth(text1.c_str(),
+		size_t len = ts->GetCharCountInsideWidth(text1.c_str(),
 			text.style, lr.x-ul.x-4);
 		ts->PrintString(text1.substr(0, len).c_str(),
 			text.style);
