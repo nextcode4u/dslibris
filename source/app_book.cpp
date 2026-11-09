@@ -162,6 +162,7 @@ void App::ToggleBookmark() {
 	}
 
 	bookcurrent->GetPage()->Draw(ts);
+	prefs->Write();
 }
 
 void App::CloseBook()
