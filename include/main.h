@@ -38,7 +38,8 @@
 #define SPLASH_TOP 44
 
 #define LOGFILEPATH "dslibris.log"
-#define PREFSPATH "dslibris.xml"
+#include "runtime_paths.h"
+#define PREFSPATH reader_preferences_path()
 
 #define FONTREGULARFILE "LiberationSerif-Regular.ttf"
 #define FONTBOLDFILE "LiberationSerif-Bold.ttf"

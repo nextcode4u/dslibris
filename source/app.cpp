@@ -37,6 +37,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include <fat.h>
 
 #include "main.h"
+#include "runtime_paths.h"
 #include "parse.h"
 #include "book.h"
 #include "button.h"
@@ -54,8 +55,8 @@ App::App()
 		melonds = true;
 	}
 
-	fontdir = std::string("font");
-	bookdir = std::string("book");
+	fontdir = reader_font_directory();
+	bookdir = reader_book_directory();
 	bookcount = 0;
 	bookselected = NULL;
 	bookcurrent = NULL;
