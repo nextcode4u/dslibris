@@ -1,4 +1,3 @@
-#include "utf8.h"
 /*
  Copyright (C) 2007-2009 Ray Haleblian
  
@@ -18,6 +17,8 @@
  
  To contact the copyright holder: rayh23@sourceforge.net
  */
+
+#include "utf8.h"
 
 #include "page.h"
 

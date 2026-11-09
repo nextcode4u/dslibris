@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 */
 
+#include "platform.h"
+
 #include "main.h"
 
 #include "dirent.h"
@@ -41,7 +43,7 @@ char msg[256];
 //! \param vblanks blanking intervals to wait, -1 for forever, default = -1
 int halt(int vblanks) {
 	int timer = vblanks;
-	while(pmMainLoop()) {
+	while(reader_main_loop()) {
 		swiWaitForVBlank();
 		if (timer == 0) break;
 		else if (timer > 0) timer--;

@@ -20,3 +20,8 @@
 /dslibris.lst
 /dslibris.smdh
 /test/*/*
+
+# Local dependency/build tooling.
+__pycache__/
+/dist/
+/core

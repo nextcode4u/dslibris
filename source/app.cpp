@@ -20,6 +20,8 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 
 */
 
+#include "platform.h"
+
 #include "app.h"
 #include "argv_launch.h"
 
@@ -30,6 +32,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include <sys/dir.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 #include <algorithm>   // for std::sort
 #include <fat.h>
 
@@ -162,7 +165,7 @@ int App::Run(const char *launch_path)
 	}
 
 	keysSetRepeat(60,2);
-	while (pmMainLoop())
+	while (reader_main_loop())
 	{
 		swiWaitForVBlank();
 		scanKeys();

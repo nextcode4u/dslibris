@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: MIT
+# Optional BlocksDS build; upstream's devkitARM Makefile remains available.
+BLOCKSDS ?= /opt/blocksds/core
+WONDERFUL_TOOLCHAIN ?= /opt/wonderful
+NAME := dslibris-blocksds
+GAME_TITLE := dslibris
+GAME_SUBTITLE := EPUB and document reader
+GAME_AUTHOR := rhaleblian and contributors
+GAME_ICON := gfx/icon.bmp
+SOURCEDIRS := source gfx
+INCLUDEDIRS := include build/deps/include $(WONDERFUL_TOOLCHAIN)/toolchain/gcc-arm-none-eabi/arm-none-eabi/include/freetype2
+LIBDIRS := build/deps
+LIBS := -lfreetype -lpng16 -lexpat -lmd4c -lpdfio -lz -lnds9
+DEFINES := -DIOAPI_NO_64 -DDSL_DOCUMENTS
+CFLAGS := -std=gnu11
+CXXFLAGS := -std=gnu++17
+include $(BLOCKSDS)/sys/default_makefiles/rom_arm9/Makefile
+
+.PHONY: dependencies
+dependencies: build/deps/.ready
+
+build/deps/.ready: tools/prepare_dependencies.py ports/dependencies.json ports/pdfio_compat.c ports/expat_config.h
+	python3 tools/prepare_dependencies.py
+
+$(OBJS_SOURCES): build/deps/.ready
