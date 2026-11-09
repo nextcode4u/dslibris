@@ -89,6 +89,7 @@ Unicode ranges/ligatures, nested Forms, limits and failure cases. Reader code ru
 under AddressSanitizer/UndefinedBehaviorSanitizer; third-party libraries use their
 normal builds. These are not physical-hardware tests.
 
-Local melonDS checks in DS mode covered EPUB, TXT, Markdown and text/Unicode PDF
-reading with a separate test SD image. Physical DS/DSi timing, SD-card behavior,
+Local melonDS checks covered EPUB, TXT, Markdown and text/Unicode PDF reading in
+DS mode, plus Gloam-to-reader argv launches for EPUB, TXT, Markdown and compressed
+PDF text in DSi mode, using separate test SD images. Physical DS/DSi timing, SD-card behavior,
 large-document peak memory and broader real-world PDF compatibility remain unverified.

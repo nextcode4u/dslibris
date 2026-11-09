@@ -49,8 +49,8 @@ Required devkitPro libraries include libnds/libfat, nds-libexpat, nds-zlib,
 nds-bzip2 and nds-libpng; upstream also supplies its FreeType port. The output name
 comes from the checkout directory (for example `DSLibris.nds`). The original
 Makefile is unchanged. A full devkitARM/libnds 2 build and host tests passed locally;
-DS-mode emulator reading checks passed for the BlocksDS build; physical-console
-and broader launcher compatibility still need testing.
+DS-mode reading and DSi-mode argv reading checks through Gloam passed for the
+BlocksDS build. Physical-console and broader launcher compatibility still need testing.
 
 ## Source changes
 
