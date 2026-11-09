@@ -77,3 +77,19 @@ and [HTMLZ input](https://github.com/kovidgoyal/calibre/blob/master/src/calibre/
 These are interoperability references, not linked/vendored dependencies. The bounded
 reader adapters and authored fixtures here are separate MIT-licensed code. No
 additional library is needed for these formats; ZIP and XML use existing dependencies.
+
+## Runtime release package
+
+`runtime-dependencies.json` pins Liberation Fonts 2.1.5 (SIL OFL-1.1), FreeType
+2.14.3 (FTL option), libpng 1.6.59 (libpng license), BlocksDS 1.25.0 SDK/CRT source
+and its selected libnds revision. `tools/build_release.py` includes those source
+archives and their notices alongside the parser dependency sources. The OFL and
+font reserved names are preserved; the five installed fonts are unmodified.
+
+`notices/gcc-COPYING.RUNTIME` is GCC's Runtime Library Exception text, SHA-256
+`9d6b43ce4d8de0c878bf16b54d8e7a10d9bd42b75178153e3af6a815bdc90f74`.
+`notices/picolibc-COPYING` retains the notice collection from Wonderful Picolibc
+revision `770d868896622d726129fa99168d5d20160d0f55`, SHA-256
+`552f9ae0e5717d3a0c28ff24db792971d1047d771992e40ea4d19b3d0042d78b`;
+source: https://codeberg.org/WonderfulToolchain/wf-picolibc/src/commit/770d868896622d726129fa99168d5d20160d0f55/COPYING.picolibc.
+These are toolchain runtime notices, not a claim that every listed object is linked.

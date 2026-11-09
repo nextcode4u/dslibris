@@ -1,0 +1,48 @@
+{
+  "liberation-fonts": {
+    "archive": "liberation-fonts-ttf-2.1.5.tar.gz",
+    "directory": "liberation-fonts-ttf-2.1.5",
+    "url": "https://github.com/liberationfonts/liberation-fonts/files/7261482/liberation-fonts-ttf-2.1.5.tar.gz",
+    "sha256": "7191c669bf38899f73a2094ed00f7b800553364f90e2637010a69c0e268f25d0",
+    "notices": [
+      "LICENSE"
+    ]
+  },
+  "freetype": {
+    "archive": "freetype-2.14.3.tar.xz",
+    "directory": "freetype-2.14.3",
+    "url": "https://download.savannah.gnu.org/releases/freetype/freetype-2.14.3.tar.xz",
+    "sha256": "36bc4f1cc413335368ee656c42afca65c5a3987e8768cc28cf11ba775e785a5f",
+    "notices": [
+      "docs/FTL.TXT",
+      "docs/GPLv2.TXT",
+      "LICENSE.TXT"
+    ]
+  },
+  "libpng": {
+    "archive": "libpng-1.6.59.tar.gz",
+    "directory": "libpng-1.6.59",
+    "url": "https://codeload.github.com/pnggroup/libpng/tar.gz/refs/tags/v1.6.59",
+    "sha256": "2540302a1844ad2b2b501977abecfa850f265f97b78f065a712ab4074a89f5b5",
+    "notices": [
+      "LICENSE"
+    ]
+  },
+  "blocksds-sdk": {
+    "archive": "blocksds-sdk-da93ad5.tar.gz",
+    "directory": "sdk-da93ad5cda6f3aea01769959b3ef7b3c5dd93673",
+    "url": "https://codeload.github.com/blocksds/sdk/tar.gz/da93ad5cda6f3aea01769959b3ef7b3c5dd93673",
+    "sha256": "a98bd684bab559e5c8220491fb1fa5392cc2211aa67ee7061aea1687dba00f66",
+    "notices": []
+  },
+  "blocksds-libnds": {
+    "archive": "blocksds-libnds-e478cc6.tar.gz",
+    "directory": "libnds-e478cc660a8c7254fbffc54bda3ce0b93ab14c15",
+    "url": "https://codeload.github.com/blocksds/libnds/tar.gz/e478cc660a8c7254fbffc54bda3ce0b93ab14c15",
+    "sha256": "44ba66904cf106b47d917ab2681a0ec0c6f7b360c39637eb2bf129a9b12fbac6",
+    "notices": [
+      "licenses/LICENSE",
+      "licenses/LICENSE.FatFs"
+    ]
+  }
+}
