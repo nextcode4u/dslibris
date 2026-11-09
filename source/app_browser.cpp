@@ -85,7 +85,7 @@ void App::browser_handleevent()
 		else
 		{
 			// select this book and open it.
-			for(u8 i=browserstart; 
+			for(int i=browserstart;
 				(i<bookcount) && (i<browserstart+APP_BROWSER_BUTTON_COUNT);
 				i++) {
 				if (buttons[i]->EnclosesPoint(coord.py, coord.px))

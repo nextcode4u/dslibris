@@ -1,4 +1,5 @@
 #include "prefs.h"
+#include "xml_attribute.h"
 
 #include <stdio.h>
 #include <sys/param.h>
@@ -21,7 +22,7 @@ void start(	void *data,
 	parsedata_t* p = (parsedata_t*)data;
 	App *app = p->app;
 	int position = 0; //! Page position in book.
-	char filename[MAXPATHLEN];
+	std::string filename;
 	bool current = FALSE;
 	int i;
 	
@@ -102,12 +103,12 @@ void start(	void *data,
 	}
 	else if (!strcmp(name, "book"))
 	{
-		strcpy(filename,"");
+		filename.clear();
 		current = FALSE;
 		position = 0;
 		for (i = 0; attr[i]; i+=2) {
 			if (!strcmp(attr[i], "file"))
-				strcpy(filename, attr[i+1]);
+				filename = attr[i+1];
 			if (!strcmp(attr[i], "page"))
 				position = atoi(attr[i+1]);
 			if (!strcmp(attr[i], "current"))
@@ -124,7 +125,7 @@ void start(	void *data,
 		for(it = app->books.begin(); it < app->books.end(); it++)
 		{
 			const char *bookname = (*it)->GetFileName();
-			if(!strcmp(bookname, filename))
+			if(!strcmp(bookname, filename.c_str()))
 			{
 				// bookmark tags will refer to this.
 				p->book = *it;
@@ -263,10 +264,10 @@ int Prefs::Write()
 			app->ts->margin.bottom, app->ts->margin.right);
  	fprintf(fp, "\t<font size=\"%d\" normal=\"%s\" bold=\"%s\" italic=\"%s\" bolditalic=\"%s\" />\n",
 		app->ts->GetPixelSize(),
-		app->ts->GetFontFile(TEXT_STYLE_REGULAR).c_str(),
-		app->ts->GetFontFile(TEXT_STYLE_BOLD).c_str(),
-		app->ts->GetFontFile(TEXT_STYLE_ITALIC).c_str(),
-		app->ts->GetFontFile(TEXT_STYLE_BOLDITALIC).c_str()
+		xml_attribute(app->ts->GetFontFile(TEXT_STYLE_REGULAR)).c_str(),
+		xml_attribute(app->ts->GetFontFile(TEXT_STYLE_BOLD)).c_str(),
+		xml_attribute(app->ts->GetFontFile(TEXT_STYLE_ITALIC)).c_str(),
+		xml_attribute(app->ts->GetFontFile(TEXT_STYLE_BOLDITALIC)).c_str()
 	);
  	fprintf(fp, "\t<paragraph indent=\"%d\" spacing=\"%d\" />\n",
 			app->paraindent,
@@ -274,10 +275,10 @@ int Prefs::Write()
 	fprintf(fp, "\t<books reopen=\"%d\">\n",
 			app->reopen);
     
-	for (u8 i = 0; i < app->bookcount; i++) {
+	for (int i = 0; i < app->bookcount; i++) {
 		Book* book = app->books[i];
 		fprintf(fp, "\t\t<book file=\"%s\" page=\"%d\"",
-		book->GetFileName(), book->GetPosition() + 1);
+		xml_attribute(book->GetFileName()).c_str(), book->GetPosition() + 1);
 		if(app->bookcurrent == app->books[i]) fprintf(fp," current=\"1\"");
 		fprintf(fp,">\n");
 		std::list<u16>* bookmarks = book->GetBookmarks();

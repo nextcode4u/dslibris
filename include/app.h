@@ -106,10 +106,10 @@ public:
 	std::vector<Button*> buttons;
 	Button buttonprev, buttonnext, buttonprefs; //! Buttons on browser bottom.
 	//! index into book vector denoting first book visible on library screen. 
-	u8 browserstart;
+	int browserstart;
 	std::string bookdir;  //! Search here for XHTML.
 	std::vector<Book*> books;
-	u8 bookcount;
+	int bookcount;
 	//! which book is currently selected in browser?
 	Book* bookselected;
 	//! which book is currently being read?
