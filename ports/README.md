@@ -65,3 +65,15 @@ rebuild and relink it, including these dependency sources and adaptations; a sou
 URL alone is not a substitute for fulfilling those terms. The checksum-pinned
 script prepares those sources locally. The legacy EPUB-only target does not link
 libmobi. New adapter files retain their separate MIT grant.
+
+## Additional format references
+
+The OPF/OEB reader follows manifest IDs and spine order described by the
+[EPUB package specification](https://www.w3.org/TR/epub-33/#sec-package-doc).
+TCR dictionary framing and PML/HTMLZ conventions were checked against calibre's
+[TCR implementation](https://github.com/kovidgoyal/calibre/blob/master/src/calibre/ebooks/compression/tcr.py),
+[PML implementation](https://github.com/kovidgoyal/calibre/blob/master/src/calibre/ebooks/pml/pmlconverter.py)
+and [HTMLZ input](https://github.com/kovidgoyal/calibre/blob/master/src/calibre/ebooks/conversion/plugins/htmlz_input.py).
+These are interoperability references, not linked/vendored dependencies. The bounded
+reader adapters and authored fixtures here are separate MIT-licensed code. No
+additional library is needed for these formats; ZIP and XML use existing dependencies.

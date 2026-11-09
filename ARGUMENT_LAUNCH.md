@@ -11,10 +11,9 @@ argv[0] = sd:/apps/dslibris.nds
 argv[1] = sd:/media/Books/My Book.epub
 ```
 
-The compatibility build accepts `.epub`; the BlocksDS build also accepts `.txt`,
-`.md`, `.markdown`, `.pdf`, `.html`/`.htm`/`.xhtml`, `.fb2`/`.fb2.zip`/`.fbz`,
-`.rtf`, `.pdb`, `.prc`, `.mobi`, `.azw`, `.azw3`, `.docx` and `.odt` (see [format support](DOCUMENT_FORMATS.md)). Extensions
-are matched without case sensitivity. Keep the entire filename in one argv
+The compatibility build accepts `.epub`. The BlocksDS build accepts the ebook and
+document formats in the [format guide](DOCUMENT_FORMATS.md), including OPF/OEB
+packages and zipped text books. Extensions are matched without case sensitivity. Keep the entire filename in one argv
 entry; spaces do not require quoting inside that entry. Standard `sd:/`, `fat:/`,
 absolute and relative paths are accepted when available through the mounted
 filesystem. An explicit device prefix selects that card before fonts/preferences
