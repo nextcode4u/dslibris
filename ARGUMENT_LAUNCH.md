@@ -1,4 +1,4 @@
-# Opening an EPUB from a launcher
+# Opening a book from a launcher
 
 This fork adds optional `argv[1]` selection to [dslibris](https://github.com/rhaleblian/dslibris),
 the upstream EPUB reader by its original contributors. It does not replace the reader,
@@ -11,16 +11,17 @@ argv[0] = sd:/apps/dslibris.nds
 argv[1] = sd:/media/Books/My Book.epub
 ```
 
-`.epub` is matched without case sensitivity. Keep the entire filename in one argv
+The compatibility build accepts `.epub`; the BlocksDS build also accepts `.txt`,
+`.md`, `.markdown` and `.pdf` (see [format support](DOCUMENT_FORMATS.md)). Extensions
+are matched without case sensitivity. Keep the entire filename in one argv
 entry; spaces do not require quoting inside that entry. Standard `sd:/`, `fat:/`,
 absolute and relative paths are accepted when available through the mounted
 filesystem. An explicit device prefix selects that card before fonts/preferences
 are loaded. Relative paths use the initial filesystem working directory.
 
 The requested book's directory becomes the library, and the normal book indexing
-and opening path selects it ahead of the saved last-opened book. Uppercase `.EPUB`
-files can also be selected even though upstream's library scanner matches lowercase
-extensions. The working directory is retained for upstream resource lookups.
+and opening path selects it ahead of the saved last-opened book. The library
+scanner now also matches supported extensions without case sensitivity. The working directory is retained for upstream resource lookups.
 Provide upstream's normal fonts/resources and preferences as usual.
 
 No argument, an unsupported extension or an unreadable/empty file leaves the normal
@@ -29,6 +30,9 @@ The adapter rejects parent paths of 512 bytes or more and basenames of 256 bytes
 more rather than truncating them. Only the first content argument is used.
 
 ## Building
+
+Use [the BlocksDS build](README.md#build-with-blocksds) for the extra document formats.
+The following retained devkitARM route builds EPUB support.
 
 Use the original Makefile and upstream README's devkitPro setup. Run `make` from
 the repository root, not `make -C` from another working directory: the existing
@@ -45,7 +49,8 @@ Required devkitPro libraries include libnds/libfat, nds-libexpat, nds-zlib,
 nds-bzip2 and nds-libpng; upstream also supplies its FreeType port. The output name
 comes from the checkout directory (for example `DSLibris.nds`). The original
 Makefile is unchanged. A full devkitARM/libnds 2 build and host tests passed locally;
-console launch/reading compatibility still needs testing.
+DS-mode emulator reading checks passed for the BlocksDS build; physical-console
+and broader launcher compatibility still need testing.
 
 ## Source changes
 
@@ -58,7 +63,8 @@ selected book. This branch started from upstream commit
 
 The `argv-launch` branch contains the fork additions; `main` is kept as an upstream
 baseline. Startup adapters and host tests are separate files, and the original
-loading routines remain responsible for file decoding and emulation. The small
+EPUB loading routines remain responsible for EPUB decoding. Additional document
+backends live separately in `source/document/` and share a bounded layout layer. The small
 hooks in existing source are the expected merge points.
 
 ```sh

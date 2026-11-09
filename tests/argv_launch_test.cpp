@@ -22,5 +22,19 @@ int main() {
     assert(argv_prepare_book(&app, nullptr).empty());
     assert(argv_prepare_book(&app, "/does-not-exist.epub").empty());
     assert(app.bookdir == root);
-    unlink(path); rmdir(root);
+    unlink(path);
+    const char *extra[] = {"Notes.TXT", "Book.md", "Book.Markdown", "Paper.PDF"};
+    for (const char *filename : extra) {
+        snprintf(path, sizeof(path), "%s/%s", root, filename);
+        file = fopen(path, "wb"); assert(file); fputs("Synthetic fixture", file); fclose(file);
+        name = argv_prepare_book(&app, path);
+        assert(name == filename);
+        selected = argv_select_book(&app, name);
+        assert(selected && selected->format == document_format(filename));
+        assert(argv_select_book(&app, name) == selected);
+        unlink(path);
+    }
+    assert(app.books.size() == 5);
+    assert(document_format("file.doc") == FORMAT_UNDEF);
+    rmdir(root);
 }

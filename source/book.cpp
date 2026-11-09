@@ -1,8 +1,13 @@
+#include "utf8.h"
 #include "book.h"
 
 #include "main.h"
 #include "parse.h"
 #include "epub.h"
+#include "document.h"
+#ifdef DSL_DOCUMENTS
+#include "document_book.h"
+#endif
 #include "app.h"
 #include <stdio.h>
 #include <errno.h>
@@ -186,7 +191,7 @@ void chardata(void *data, const XML_Char *txt, int txtlen)
 		p->linebegan = false;
 	}
 
-	u8 advance=0;
+	int advance = 0;
 	int i=0, j=0;
 	while (i<txtlen)
 	{
@@ -227,11 +232,11 @@ void chardata(void *data, const XML_Char *txt, int txtlen)
 			{
 				/** set type until the end of the next word.
 				    account for UTF-8 characters when advancing. **/
-				u32 code = txt[j];
+				u32 code = (unsigned char)txt[j];
 				bytes = 1;
 				if (code >> 7) {
 					// FIXME the performance bottleneck					
-					bytes = ts->GetCharCode((char*)&(txt[j]),&code);
+					bytes = utf8_decode(txt + j, txtlen - j, &code);
 				}
 
 				advance += ts->GetAdvance(code);
@@ -645,9 +650,16 @@ u8 Book::Open()
 	path.append(GetFileName());
 	// Page layout is a function of the current style.
 	app->ts->SetStyle(TEXT_STYLE_REGULAR);
-	u8 err = epub(this,path,false);
+	Close();
+	u8 err;
+#ifdef DSL_DOCUMENTS
+	if (format != FORMAT_EPUB) err = document_open_book(this, path.c_str());
+	else
+#endif
+	    err = epub(this, path, false);
+	if (!err && pages.empty()) err = document::NoText;
 	if (!err)
-		if(position > (int)pages.size()) position = pages.size()-1;
+		if (position < 0 || position >= (int)pages.size()) position = 0;
 	return err;
 }
 
@@ -657,6 +669,7 @@ u8 Book::Index()
 	path.append(GetFolderName());
 	path.append("/");
 	path.append(GetFileName());
+	if (format != FORMAT_EPUB) return 0; // Other formats use the filename; parse on open.
 	int err = epub(this,path,true);
 	return err;
 }

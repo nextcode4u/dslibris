@@ -223,18 +223,17 @@ int App::FindBooks() {
 	{
 		char *filename = ent->d_name;
 		if(*filename == '.') continue;
-		// Starting from the end, find the file extension.
-		char *c;
-		for (c=filename+strlen(filename)-1;
-		     c!=filename && *c!='.';
-		     c--);
-		if (!strcmp(".epub",c))
+		std::string path = bookdir + "/" + filename;
+		struct stat info;
+		if (stat(path.c_str(), &info) || !S_ISREG(info.st_mode)) continue;
+		format_t format = document_format(filename);
+		if (format != FORMAT_UNDEF)
 		{
 			Book *book = new Book(this);
 			book->SetFolderName(bookdir.c_str());
 			book->SetFileName(filename);
 			book->SetTitle(filename);
-			book->format = FORMAT_EPUB;
+			book->format = format;
 			books.push_back(book);
 			bookcount++;
 		}

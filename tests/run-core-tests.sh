@@ -1,6 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: MIT
 set -eu
+ulimit -c 0
 cd "$(dirname "$0")/.."
 output=$(mktemp -d)
 trap 'rm -rf "$output"' EXIT HUP INT TERM

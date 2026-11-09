@@ -1,4 +1,7 @@
 #include "app.h"
+#ifdef DSL_DOCUMENTS
+#include "document.h"
+#endif
 
 #include <errno.h>
 #include <stdlib.h>
@@ -187,11 +190,16 @@ u8 App::OpenBook(void)
 	if(!bookselected) return 254;
 
 	PrintStatus("opening book ...");
-	if(bookcurrent) bookcurrent->Close();
+	if (bookcurrent) bookcurrent->Close();
+	bookcurrent = nullptr;
 	if (int err = bookselected->Open())
 	{
 		char msg[64];
-		sprintf(msg, "error (%d)", err);
+#ifdef DSL_DOCUMENTS
+		if (err >= document::ReadError) snprintf(msg, sizeof(msg), "%s", document::error_message(err));
+		else
+#endif
+		    snprintf(msg, sizeof(msg), "error (%d)", err);
 		PrintStatus(msg);
 		return err;
 	}

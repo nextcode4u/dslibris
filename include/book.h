@@ -7,7 +7,7 @@
 #include "app.h"
 #include "page.h"
 
-typedef enum {FORMAT_UNDEF, FORMAT_XHTML, FORMAT_EPUB} format_t;
+#include "document_format.h"
 
 namespace xml::book {
 	void start(void *data, const char *el, const char **attr);

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 class App;
-enum { FORMAT_EPUB = 1 };
+#include "document_format.h"
 class Book {
     std::string filename, folder, title;
 public:

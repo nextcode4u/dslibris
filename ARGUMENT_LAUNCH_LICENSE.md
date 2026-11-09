@@ -2,7 +2,7 @@ MIT License
 
 Copyright (c) 2026 nextcode4u
 
-Applies only to new argv integration, host tests and build adapters in this fork.
+Applies only to new argv/document integration, host tests and build adapters in this fork.
 All pre-existing source and assets retain their upstream licenses and credits.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
