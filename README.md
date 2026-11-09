@@ -65,7 +65,7 @@ Commit changes first. The script builds the ROM, verifies the pinned font/runtim
 sources, and writes ignored `dist/<tag>/` packages: runtime ZIP with the five
 Liberation Fonts, standalone NDS, matching source/dependency archives, notices,
 build metadata and checksums. It does not publish a GitHub release. The source
-archive omits obsolete prebuilt libraries/fonts/books from the upstream legacy
+archive omits legacy test data and obsolete prebuilt libraries/fonts/books from the upstream legacy
 SD distribution; they are not BlocksDS build inputs. Exact font/SDK/library source
 pins are in `ports/runtime-dependencies.json`.
 

@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import io
 import json
+import os
 from pathlib import Path
 import subprocess
 import tarfile
@@ -46,6 +47,13 @@ def build(tag, skip_build=False):
     dirty = subprocess.check_output(['git', 'status', '--porcelain'], cwd=ROOT, text=True)
     if dirty.strip():
         raise ValueError('Commit source changes before preparing a versioned release')
+    sdk = Path(os.environ.get('BLOCKSDS', '/opt/blocksds/core'))
+    toolchain = Path(os.environ.get('WONDERFUL_TOOLCHAIN', '/opt/wonderful'))
+    sdk_version = (sdk/'version.txt').read_text().strip().removeprefix('v')
+    compiler = toolchain/'toolchain/gcc-arm-none-eabi/bin/arm-none-eabi-gcc'
+    gcc_version = subprocess.check_output([str(compiler), '-dumpfullversion'], text=True).strip()
+    if sdk_version != '1.25.0':
+        raise ValueError('Review SDK/runtime source pins before packaging another SDK version')
     if not skip_build:
         subprocess.run(['make', '-f', 'Makefile.blocksds', '-j4'], cwd=ROOT, check=True)
     commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
@@ -76,7 +84,7 @@ def build(tag, skip_build=False):
     tracked = subprocess.check_output(['git','ls-files','-z'],cwd=ROOT).decode().split('\0')
     for name in filter(None, tracked):
         # Old prebuilt distribution assets are not inputs to the BlocksDS build.
-        if Path(name).suffix.lower() in {'.ttf','.epub','.dldi','.a','.nds','.elf'}:
+        if name.startswith(('test/', 'portlibs/', 'etc/filesystem/')) or Path(name).suffix.lower() in {'.ttf','.otf','.epub','.dldi','.a','.nds','.elf'}:
             continue
         source[name] = (ROOT/name).read_bytes()
     for item in manifests.values():
@@ -87,7 +95,7 @@ def build(tag, skip_build=False):
         'tools/prepare_dependencies.py verifies hashes and applies the recorded embedded adaptations.\n'
         'Use the pinned BlocksDS SDK/libnds and Wonderful package versions from BUILD-INFO.json.\n'
         'Runtime sources/fonts are pinned in ports/runtime-dependencies.json.\n').encode()
-    info = {'tag':tag,'commit':commit,'target':'Makefile.blocksds','blocksds':'1.25.0','gcc':'16.2.0',
+    info = {'tag':tag,'commit':commit,'target':'Makefile.blocksds','blocksds':sdk_version,'gcc':gcc_version,
             'freetype':'2.14.3','libpng':'1.6.59','zlib':'1.3.2','dependencies':manifests,
             'runtime_files':{name:checksum(data) for name,data in sorted(runtime.items())}}
     encoded = (json.dumps(info,indent=2)+'\n').encode()
