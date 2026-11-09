@@ -89,7 +89,12 @@ int read_markdown(FILE *file, Sink &sink, Limits limits)
         input.append(chunk, n);
     }
     if (ferror(file)) return ReadError;
-    if (input.compare(0, 3, "\xef\xbb\xbf") == 0) input.erase(0, 3);
+    return read_markdown_data(input.data(), input.size(), sink, limits);
+}
+int read_markdown_data(const char *data, size_t size, Sink &sink, Limits limits)
+{
+    if (size > limits.input_bytes) return TooLarge;
+    if (size >= 3 && !memcmp(data, "\xef\xbb\xbf", 3)) { data += 3; size -= 3; }
     Markdown state{sink, 0, 0, {}, false};
     MD_PARSER parser{};
     parser.flags = MD_FLAG_TABLES | MD_FLAG_NOHTML;
@@ -98,7 +103,7 @@ int read_markdown(FILE *file, Sink &sink, Limits limits)
     parser.enter_span = enter_span;
     parser.leave_span = leave_span;
     parser.text = text;
-    return md_parse(input.data(), (MD_SIZE)input.size(), &parser, &state) ? Invalid : Ok;
+    return md_parse(data, (MD_SIZE)size, &parser, &state) ? Invalid : Ok;
 }
 }
 #endif

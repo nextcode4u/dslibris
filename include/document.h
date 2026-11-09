@@ -56,10 +56,12 @@ private:
 };
 
 int read_text(FILE *file, Sink &sink, Limits limits);
+int read_markdown_data(const char *data, size_t size, Sink &sink, Limits limits);
 int read_markdown(FILE *file, Sink &sink, Limits limits);
 int read_html(FILE *file, Sink &sink, Limits limits);
 int read_xml_book(const char *path, format_t format, Sink &sink, Limits limits);
 int read_rtf(FILE *file, Sink &sink, Limits limits);
+int read_package(const char *path, format_t format, Sink &sink, Limits limits);
 int read_mobi(const char *path, Sink &sink, Limits limits);
 int read_pdf(const char *path, Sink &sink, Limits limits);
 }

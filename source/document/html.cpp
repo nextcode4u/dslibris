@@ -209,10 +209,10 @@ int read_html(FILE *file, Sink &sink, Limits limits)
     TextInput input(file, limits.input_bytes);
     return Html(input, sink).run();
 }
-int read_html_data(const char *data, size_t size, Sink &sink, Limits limits, Encoding encoding)
+int read_html_data(const char *data, size_t size, Sink &sink, Limits limits, Encoding encoding, bool honor_charset)
 {
     TextInput input(data, size, limits.input_bytes, encoding);
-    return Html(input, sink, false).run();
+    return Html(input, sink, honor_charset).run();
 }
 }
 #endif

@@ -44,7 +44,10 @@ int document_open_book(Book *book, const char *path)
     BookOutput output(book);
     document::Layout layout(output, width, remaining / step + 1, limits);
     int status;
-    if (book->format == FORMAT_MOBI) status = document::read_mobi(path, layout, limits);
+    if (book->format == FORMAT_OPF || book->format == FORMAT_OEB_ZIP
+        || book->format == FORMAT_HTML_ZIP || book->format == FORMAT_TEXT_ZIP)
+        status = document::read_package(path, book->format, layout, limits);
+    else if (book->format == FORMAT_MOBI) status = document::read_mobi(path, layout, limits);
     else if (book->format == FORMAT_PDF) status = document::read_pdf(path, layout, limits);
     else if (book->format == FORMAT_FB2 || book->format == FORMAT_FB2_ZIP
              || book->format == FORMAT_DOCX || book->format == FORMAT_ODT)
