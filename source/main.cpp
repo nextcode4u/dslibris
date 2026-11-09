@@ -27,6 +27,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #include "nds.h"
 
 #include "app.h"
+#include "argv_path.h"
 #include "book.h"
 #include "button.h"
 #include "text.h"
@@ -55,18 +56,21 @@ int halt(const char *msg, int vblanks) {
 	return halt(vblanks);
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	defaultExceptionHandler();
 	// consoleDemoInit();
 	// consoleDebugInit(DebugDevice_NOCASH);
 	// fprintf(stderr, "dslibris %s\n", VERSION);
 
+	// Copy loader-owned argv before initialization can reuse its memory.
+	std::string launch_path = (argc > 1 && argv && argv[1]) ? argv[1] : "";
 	if (!fatInitDefault())
 		halt("[FAIL] filesystem\n");
 
+	if (!argv_path_select_root(launch_path.c_str())) launch_path.clear();
 	app = new App();
-	return app->Run();
+	return app->Run(launch_path.empty() ? NULL : launch_path.c_str());
 }
 
 u8 GetParserFace(parsedata_t *pdata)

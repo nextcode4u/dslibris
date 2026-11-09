@@ -133,7 +133,7 @@ public:
 	void CycleBrightness();
 	void PrintStatus(const char *msg);
 	void PrintStatus(std::string msg);
-	int  Run(void);
+	int  Run(const char *launch_path = NULL);
 	void SetProgress(int amount);
 	touchPosition TouchRead();
 	void UpdateClock();

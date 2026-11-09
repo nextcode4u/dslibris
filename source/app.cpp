@@ -21,6 +21,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
 #include "app.h"
+#include "argv_launch.h"
 
 #include <errno.h>
 #include <stdlib.h>
@@ -105,7 +106,7 @@ static bool book_title_lessthan(Book* a, Book* b)
     return strcasecmp(a->GetTitle(),b->GetTitle()) < 0;
 }
 
-int App::Run(void)
+int App::Run(const char *launch_path)
 {
 	const int ok = 0;
 
@@ -122,7 +123,10 @@ int App::Run(void)
 
 	// Construct library.
 
-	if (FindBooks() != ok)
+	const std::string launch_name = argv_prepare_book(this, launch_path);
+	const int library_result = FindBooks();
+	Book *launch_book = argv_select_book(this, launch_name);
+	if (library_result != ok && !launch_book)
 		halt("[FAIL] no book directory\n");
 	if (bookcount == 0)
 		halt("[FAIL] no books\n");
@@ -130,6 +134,7 @@ int App::Run(void)
 	std::sort(books.begin(),books.end(),&book_title_lessthan);
 
 	prefs->Read();
+	if (launch_book) bookdir = launch_book->GetFolderName();
 	for(auto &book : books)
 	{
 		book->Index();
@@ -147,7 +152,11 @@ int App::Run(void)
 	// Resume reading from the last session.
 
 	// char msg[32]; sprintf(msg, "%d\n", bookcurrent); halt(msg);
-	if(reopen && bookcurrent) {
+	if (launch_book) {
+		bookselected = launch_book;
+		OpenBook();
+	}
+	else if(reopen && bookcurrent) {
 		bookselected = bookcurrent;
 		OpenBook();
 	}
