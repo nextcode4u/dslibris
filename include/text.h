@@ -56,7 +56,7 @@ class Cache {
 public:
 	//! Associates each glyph cache index (value)
 	//! with its Unicode code point (key).
-	std::map<u16, FT_GlyphSlot> cacheMap;
+	std::map<u32, FT_GlyphSlot> cacheMap;
 	//! ??
 	u16 cachenext;
 	

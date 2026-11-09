@@ -1,3 +1,4 @@
+#include "utf8.h"
 /* 
 
 dslibris - an ebook reader for the Nintendo DS.
@@ -55,7 +56,7 @@ Text::Text()
 
 	screenleft = (u16*)BG_BMP_RAM_SUB(0);
 	screenright = (u16*)BG_BMP_RAM(0);
-	offscreen = new u16[display.width * display.height];
+	offscreen = new u16[display.height * display.height];
 	margin.left = MARGINLEFT;
 	margin.right = MARGINRIGHT;
 	margin.top = MARGINTOP;
@@ -95,7 +96,7 @@ Text::Text()
 Text::~Text()
 {
 	// framebuffers
-	free(offscreen);
+	delete[] offscreen;
 	
 	// homemade cache
 	ClearCache();
@@ -179,7 +180,8 @@ FT_Error Text::CreateFace(int style) {
 int Text::InitCache(void) {
 	//! Use our own cheesey glyph cache.
 
-	FT_Init_FreeType(&library);	
+	error = FT_Init_FreeType(&library);
+	if (error) return error;
 	error |= CreateFace(TEXT_STYLE_BROWSER);
 	error |= CreateFace(TEXT_STYLE_REGULAR);
 	error |= CreateFace(TEXT_STYLE_ITALIC);
@@ -236,11 +238,13 @@ int Text::CacheGlyph(u32 ucs, FT_Face face)
 	FT_Load_Char(face, ucs,
 		FT_LOAD_RENDER|FT_LOAD_TARGET_NORMAL);
 	FT_GlyphSlot src = face->glyph;
-	FT_GlyphSlot dst = new FT_GlyphSlotRec;
+	FT_GlyphSlot dst = new FT_GlyphSlotRec{};
 	int x = src->bitmap.rows;
 	int y = src->bitmap.width;
 	dst->bitmap.buffer = new unsigned char[x*y];
-	memcpy(dst->bitmap.buffer, src->bitmap.buffer, x*y);
+	for (int row = 0; row < x; ++row)
+		memcpy(dst->bitmap.buffer + row*y, src->bitmap.buffer + row*src->bitmap.pitch, y);
+	dst->bitmap.pitch = y;
 	dst->bitmap.rows = src->bitmap.rows;
 	dst->bitmap.width = src->bitmap.width;
 	dst->bitmap_top = src->bitmap_top;
@@ -276,7 +280,7 @@ FT_GlyphSlot Text::GetGlyph(u32 ucs, int flags, FT_Face face)
 {
 	if (ftc) halt("error: GetGlyph() called with ftc enabled");
 
-	std::map<u16,FT_GlyphSlot>::iterator iter = textCache[face]->cacheMap.find(ucs);
+	std::map<u32,FT_GlyphSlot>::iterator iter = textCache[face]->cacheMap.find(ucs);
 	if (iter != textCache[face]->cacheMap.end()) {
 		stats_hits++;
 		hit = true;
@@ -309,9 +313,10 @@ void Text::ClearCache(u8 style)
 
 void Text::ClearCache(FT_Face face)
 {
-	for(std::map<u16, FT_GlyphSlot>::iterator iter = textCache[face]->cacheMap.begin();
+	for(std::map<u32, FT_GlyphSlot>::iterator iter = textCache[face]->cacheMap.begin();
 		iter != textCache[face]->cacheMap.end();
 		iter++) {
+		delete[] iter->second->bitmap.buffer;
 		delete iter->second;
 	}
 	textCache[face]->cacheMap.clear();
@@ -319,15 +324,9 @@ void Text::ClearCache(FT_Face face)
 
 void Text::ClearScreen()
 {
-	const int pixelcount = display.width*display.height;
-	if(invert) memset((void*)screen,0,pixelcount*4);
-	else {
-		memset((void*)screen,255,pixelcount*4);
-		
-		// alternately, off-white...
-		// const u16 pixel = RGB15(29,29,29)|BIT(15);
-		// for (int i=0; i<pixelcount; i++) screen[i] = pixel;
-	}
+	// Both rotated screens use a 256-pixel VRAM stride.
+	const size_t bytes = display.height * display.height * sizeof(*screen);
+	memset(screen, invert ? 0 : 255, bytes);
 }
 
 void Text::ClearRect(u16 xl, u16 yl, u16 xh, u16 yh)
@@ -352,11 +351,12 @@ u8 Text::GetStringWidth(const char *txt, FT_Face face)
 	//! Return total advance in pixels.
 	u8 width = 0;
 	const char *c;
-	for(c = txt; c != NULL; c++)
+	for(c = txt; *c;)
 	{
 		u32 ucs = 0;
 		GetCharCode(c, &ucs);
 		width += GetAdvance(ucs, face);
+		c += GetCharCode(c, &ucs);
 	}
 	return width;
 }
@@ -377,30 +377,9 @@ u8 Text::GetCharCountInsideWidth(const char *txt, u8 style, u8 pixels) {
 }
 
 u8 Text::GetCharCode(const char *utf8, u32 *ucs) {
-	//! Given a UTF-8 encoding, fill in the Unicode/UCS code point.
-	//! Return the bytelength of the encoding, for advancing
-	//! to the next character; 0 if encoding could not be translated.
-	
-	if (utf8[0] < 0x80) { // ASCII
-		*ucs = utf8[0];
-		return 1;
-
-	} else if (utf8[0] > 0xc1 && utf8[0] < 0xe0) { // latin
-		*ucs = ((utf8[0]-192)*64) + (utf8[1]-128);
-		return 2;
-
-	} else if (utf8[0] > 0xdf && utf8[0] < 0xf0) { // asian
-		*ucs = (utf8[0]-224)*4096 + (utf8[1]-128)*64 + (utf8[2]-128);
-		return 3;
-
-	} else if (utf8[0] > 0xef) {
-		*ucs = ((utf8[0] & 0x07) << 18) |
-			((utf8[1] & 0x3F) << 12) |
-			((utf8[2] & 0x3F) << 6) |
-			(utf8[3] & 0x3F);
-		return 4;
-	}
-	return 0;
+	size_t available = 0;
+	while (available < 4 && utf8[available]) ++available;
+	return utf8_decode(utf8, available, ucs);
 }
 
 std::string Text::GetFontName(u8 style) {
@@ -546,7 +525,7 @@ void Text::PrintChar(u32 ucs, FT_Face face) {
 	// Draw a character for the given UCS codepoint,
 	// into the current screen buffer at the current pen position.
 
-	u16 bx, by, width, height = 0;
+	int bx, by, width, height = 0;
 	FT_Byte *buffer = NULL;
 	FT_UInt advance = 0;
 	FTC_Node anode = nullptr;
@@ -622,9 +601,10 @@ void Text::PrintChar(u32 ucs, FT_Face face) {
 #ifdef DRAW_CACHE_MISSES
 			// if(!hit) pixel = RGB15(a>>3,0,0) | BIT(15);
 #endif
-			u16 sx = (pen.x+gx+bx);
-			u16 sy = (pen.y+gy-by);
-			screen[sy*display.height+sx] = pixel;
+			int sx = pen.x + gx + bx;
+			int sy = pen.y + gy - by;
+			if (sx >= 0 && sx < display.width && sy >= 0 && sy < display.height)
+				screen[sy*display.height+sx] = pixel;
 		}
 	}
 
@@ -669,14 +649,14 @@ void Text::PrintString(const char *s, u8 style) {
 
 void Text::PrintString(const char *s, FT_Face face) {
 	//! Render a character string starting at the pen position.
-	u8 i=0;
-	while(i<strlen((char*)s)) {
+	size_t i = 0, length = strlen(s);
+	while (i < length) {
 		u32 c = s[i];
 		if (c == '\n') {
 			PrintNewLine();
 			i++;
 		} else {
-			i+=GetCharCode(&(s[i]),&c);
+			i += utf8_decode(s + i, length - i, &c);
 			PrintChar(c, face);
 		}
 	}

@@ -1,3 +1,4 @@
+#include "utf8.h"
 /*
  Copyright (C) 2007-2009 Ray Haleblian
  
@@ -33,15 +34,15 @@ Page::Page(Book *b)
 
 Page::~Page()
 {
-	if(buf) delete buf;
+	delete[] buf;
 }
 
 u8 Page::SetBuffer(u8 *src, u16 len)
 {
 	//! Write to offscreen buffer. NYI
-	if(buf) delete buf;
+	delete[] buf;
 	buf = new u8[len];
-	strncpy((char*)buf, (char*)src, len);
+	memcpy(buf, src, len);
 	length = len;
 	return 0;
 }
@@ -49,7 +50,7 @@ u8 Page::SetBuffer(u8 *src, u16 len)
 void Page::Cache(FILE *fp)
 {
 	if(!buf) return;
-	fwrite((const char*)buf, 1, strlen((char*)buf), fp);
+	fwrite((const char*)buf, 1, length, fp);
 }
 
 #if 0
@@ -62,7 +63,6 @@ void Page::Draw()
 
 void Page::Draw(Text *ts)
 {
-	iprintf("hi\n");
 	//! Write to offscreen buffer, then blit to video memory, for both screens.
 	ts->InitPen();
 	ts->linebegan = false;
@@ -109,7 +109,7 @@ void Page::Draw(Text *ts)
 				else
 					break;
 			}
-			else if (ts->linebegan) {
+			else {
 				ts->PrintNewLine();
 			}
 		} else if (c == TEXT_BOLD_ON) {
@@ -126,7 +126,7 @@ void Page::Draw(Text *ts)
 			ts->italic = false;
 		} else {
 			if (c > 127)
-				i+=ts->GetCharCode((char*)&(buf[i]),&c);
+				i += utf8_decode((char*)buf + i, length - i, &c);
 			else
 				i++;
 			
