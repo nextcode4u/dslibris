@@ -7,7 +7,7 @@
 #include "document_format.h"
 
 namespace document {
-enum Error { Ok = 0, ReadError = 240, TooLarge, Invalid, Unsupported, NoText, LayoutError };
+enum Error { Ok = 0, ReadError = 240, TooLarge, Invalid, Unsupported, NoText, LayoutError, Encrypted };
 const char *error_message(int code);
 
 struct Limits {
@@ -57,5 +57,8 @@ private:
 
 int read_text(FILE *file, Sink &sink, Limits limits);
 int read_markdown(FILE *file, Sink &sink, Limits limits);
+int read_html(FILE *file, Sink &sink, Limits limits);
+int read_xml_book(const char *path, format_t format, Sink &sink, Limits limits);
+int read_rtf(FILE *file, Sink &sink, Limits limits);
 int read_pdf(const char *path, Sink &sink, Limits limits);
 }

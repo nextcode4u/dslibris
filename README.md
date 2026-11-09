@@ -18,7 +18,7 @@ ebook reader for the Nintendo DS.
 This is nextcode4u's fork of [rhaleblian/dslibris](https://github.com/rhaleblian/dslibris).
 The original reader and its two-screen design are the work of the upstream authors.
 Fork additions provide launcher arguments, a current BlocksDS build, and TXT,
-Markdown and reflowed PDF text alongside EPUB.
+Markdown, reflowed PDF, HTML/XHTML, FictionBook, RTF, DOCX and ODT text alongside EPUB.
 
 - [Document formats and limits](DOCUMENT_FORMATS.md)
 - [Launcher arguments and upstream merges](ARGUMENT_LAUNCH.md)

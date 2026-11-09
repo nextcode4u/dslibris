@@ -2,7 +2,7 @@
 #ifdef DSL_DOCUMENTS
 #include "document.h"
 #include "md4c.h"
-#include "utf8.h"
+#include "entities.h"
 #include <stdlib.h>
 #include <string.h>
 #include <vector>
@@ -75,16 +75,8 @@ static int text(MD_TEXTTYPE type, const MD_CHAR *s, MD_SIZE n, void *data)
     if (type == MD_TEXT_BR) return !sink.newline();
     if (type == MD_TEXT_SOFTBR) return !sink.text(" ", 1);
     if (type == MD_TEXT_ENTITY) {
-        std::string entity(s, n);
-        uint32_t code = 0;
-        if (n > 3 && s[1] == '#') code = strtoul(entity.c_str() + (s[2] == 'x' || s[2] == 'X' ? 3 : 2), nullptr, s[2] == 'x' || s[2] == 'X' ? 16 : 10);
-        else if (entity == "&amp;") code = '&';
-        else if (entity == "&lt;") code = '<';
-        else if (entity == "&gt;") code = '>';
-        else if (entity == "&quot;") code = '"';
-        else if (entity == "&apos;") code = '\'';
-        else if (entity == "&nbsp;") code = ' ';
-        if (code) { char bytes[4]; return !sink.text(bytes, utf8_encode(code, bytes)); }
+        std::string decoded = decode_entity(std::string(s, n));
+        return !sink.text(decoded.data(), decoded.size());
     }
     return !sink.text(s, n);
 }

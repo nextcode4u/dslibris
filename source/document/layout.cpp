@@ -138,7 +138,8 @@ const char *error_message(int code)
     case ReadError: return "Cannot read document";
     case TooLarge: return "Document exceeds memory limit";
     case Invalid: return "Invalid document";
-    case Unsupported: return "Unsupported PDF encoding or encryption";
+    case Unsupported: return "Unsupported format or encoding";
+    case Encrypted: return "Encrypted book is not supported";
     case NoText: return "No readable text layer";
     case LayoutError: return "Cannot lay out document";
     default: return "Cannot open document";

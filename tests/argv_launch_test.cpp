@@ -23,7 +23,8 @@ int main() {
     assert(argv_prepare_book(&app, "/does-not-exist.epub").empty());
     assert(app.bookdir == root);
     unlink(path);
-    const char *extra[] = {"Notes.TXT", "Book.md", "Book.Markdown", "Paper.PDF"};
+    const char *extra[] = {"Notes.TXT", "Book.md", "Book.Markdown", "Paper.PDF", "Page.HTML", "Page.xhtml", "Book.FB2", "Book.FB2.ZIP",
+                           "Book.fbz", "Book.RTF", "Book.DOCX", "Book.ODT"};
     for (const char *filename : extra) {
         snprintf(path, sizeof(path), "%s/%s", root, filename);
         file = fopen(path, "wb"); assert(file); fputs("Synthetic fixture", file); fclose(file);
@@ -34,7 +35,7 @@ int main() {
         assert(argv_select_book(&app, name) == selected);
         unlink(path);
     }
-    assert(app.books.size() == 5);
+    assert(app.books.size() == 1 + sizeof(extra)/sizeof(extra[0]));
     assert(document_format("file.doc") == FORMAT_UNDEF);
     rmdir(root);
 }

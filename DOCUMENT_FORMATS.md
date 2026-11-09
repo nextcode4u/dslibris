@@ -11,6 +11,10 @@ case-insensitive; directory names resembling books are skipped.
 | `.txt` | UTF-8 and BOM-marked UTF-16LE/BE text, CR/LF/CRLF newlines, blank lines and tab indentation |
 | `.md`, `.markdown` | CommonMark text, headings, bold/italic, lists, code blocks, link labels, image alt text and simple table text |
 | `.pdf` | Extracted text reflowed into reader pages; no original page layout or image rendering |
+| `.html`, `.htm`, `.xhtml` | Local text, headings, basic emphasis, lists, code blocks and HTML entities |
+| `.fb2`, `.fb2.zip`, `.fbz` | FictionBook body text, headings, emphasis, verse and notes; ZIP stays in memory |
+| `.rtf` | Rich Text Format paragraphs, direct bold/italic, Unicode and Windows-1252/1251 text |
+| `.docx`, `.odt` | Main document text and simple table rows from the Office/OpenDocument ZIP |
 
 For example, a launcher can pass `sd:/media/Books/Notes.md` or
 `sd:/media/Books/Manual.pdf` as one argument to `dslibris-blocksds.nds`.
@@ -26,10 +30,45 @@ not guessed. Invalid Unicode is replaced with a replacement character; input byt
 Markdown uses MD4C. Links display their labels and images display alt text;
 there is no web browser, image loader or syntax highlighting. Fenced code preserves
 indentation but uses the selected reading font. Tables are flattened into rows
-with separators. Numeric Unicode entities and common named XML/HTML entities are
-decoded; other named entities can remain spelled out. Raw HTML has no rendering
+with separators. Numeric Unicode entities and MD4C's complete named HTML entity table are decoded;
+unknown names remain literal. Raw HTML has no rendering
 or execution support. This is a book-style rendering of Markdown rather than a
 pixel-equivalent HTML preview.
+
+## HTML, FictionBook, RTF and office documents
+
+HTML/XHTML reading is a bounded text extractor, not a browser. It preserves
+headings, direct bold/italic, paragraphs, simple list markers and preformatted
+text. HTML entities and CDATA are decoded; comments, head metadata, scripts and
+styles are omitted. Image alt labels can appear but images, CSS, JavaScript and
+linked resources are never loaded. UTF-8/UTF-16 BOMs and common declared UTF-8,
+Windows-1252/1251 and ISO-8859-1 encodings are supported. Unrecognized encodings
+are rejected. Malformed markup can be rejected rather than repaired like a browser.
+
+FictionBook reads body sections, headings, emphasis, poems and notes in document
+order. Embedded base64 binaries and description metadata are not rendered. Library
+labels use the filename. FB2 ZIPs must contain exactly one `.fb2` document; no
+archive entries are extracted to the SD card. Ambiguous archives, encryption,
+XML DTDs and damaged ZIP CRCs are rejected.
+
+RTF supports groups, direct bold/italic, Unicode escapes (including surrogate
+pairs), paragraph/tab controls, Windows-1252 and Windows-1251 ANSI text. It omits
+font/color tables, picture/object data, metadata and ignorable destinations.
+Fonts, colors, positioning, complex fields and full word-processor layout are not
+reproduced. Unsupported ANSI code pages are rejected.
+
+DOCX reads `word/document.xml`, including direct bold/italic run properties. ODT
+reads `content.xml`, with headings, paragraphs, list markers and explicit spacing.
+Both flatten table cells and omit pictures, styling resources, headers, footers
+and separate notes/attachments. They do not execute macros or fetch links. Binary
+`.doc` is a different format and is not accepted as DOCX.
+
+These formats share the existing page/font/bookmark UI. A filename is not proof
+of valid content: parsing validates the underlying markup/container and can return
+a readable error. XML depth is capped at 128; archive directory scans at 4096
+entries; decoded XML also has the normal input-byte limit. HTML tags are capped
+at 4 KiB and nesting at 128, while comments and text are streamed. RTF nesting is
+capped at 128. No DTD or external XML entity resolver is enabled.
 
 ## PDF scope
 
@@ -50,7 +89,7 @@ Limits prevent silently truncating a document:
 
 | Bound | DS | DSi |
 | --- | --- | --- |
-| TXT/PDF input bytes | 2 MiB | 8 MiB |
+| Text/PDF/HTML/XML/RTF input bytes | 2 MiB | 8 MiB |
 | Markdown source (loaded for MD4C) | 256 KiB | 1 MiB |
 | Generated page data | 384 KiB | 2 MiB |
 | Reader page count | 1024 | 4096 |
@@ -85,7 +124,8 @@ sh tests/run-document-tests.sh
 The document tests build native dependency copies when needed and generate original
 PDF fixtures locally. They check TXT newlines, malformed UTF-8, long words, page and
 style boundaries, Markdown, compressed and split PDF streams, font encodings,
-Unicode ranges/ligatures, nested Forms, limits and failure cases. Reader code runs
+Unicode ranges/ligatures, nested Forms, HTML/RTF text, FB2 and office ZIPs,
+Unicode encodings, entity/DTD handling, CRC checks, limits and failure cases. Reader code runs
 under AddressSanitizer/UndefinedBehaviorSanitizer; third-party libraries use their
 normal builds. These are not physical-hardware tests.
 

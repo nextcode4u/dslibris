@@ -8,7 +8,7 @@ tests. No dependency binaries or download archives are checked in.
 | Dependency | Purpose | Terms retained |
 | --- | --- | --- |
 | [Expat 2.10.0](https://github.com/libexpat/libexpat/tree/R_2_10_0) | EPUB and preferences XML | MIT, upstream `COPYING` |
-| [MD4C 0.6.0](https://github.com/mity/md4c/tree/v0.6.0) | CommonMark parsing | MIT, upstream `LICENSE.md` |
+| [MD4C 0.6.0](https://github.com/mity/md4c/tree/v0.6.0) | CommonMark parsing and named HTML entities | MIT, upstream `LICENSE.md` |
 | [PDFio 1.6.6](https://github.com/michaelrsweet/pdfio/tree/v1.6.6) | PDF objects, compression and text streams | Apache-2.0, upstream `LICENSE` and `NOTICE`, including its GPLv2 combination exception |
 | [zlib/MiniZip 1.3.2](https://github.com/madler/zlib/tree/v1.3.2) | Headers for upstream's existing MiniZip source | zlib/MiniZip notices |
 

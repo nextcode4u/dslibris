@@ -71,7 +71,7 @@ def main():
     file_source.write_text(re.sub(r'(?:\(uint64_t\))*obj->offset >>', '((uint64_t)obj->offset) >>', file_source.read_text()))
     units = {
         'expat': [expat / 'lib' / (name + '.c') for name in ('xcs', 'xmlparse', 'xmlrole', 'xmltok')],
-        'md4c': [sources['md4c'] / 'src/md4c.c'],
+        'md4c': [sources['md4c'] / 'src' / name for name in ('md4c.c', 'entity.c')],
         'pdfio': sorted(pdfio.glob('pdfio-*.c')) + [pdfio / 'ttf.c', ROOT / 'ports/pdfio_compat.c'],
     }
     for name, files in units.items():
@@ -95,7 +95,7 @@ def main():
     end = example.index('\n};', example.index('static name_map_t', start)) + 3
     glyphs = example[start:end].replace('static name_map_t', 'static const name_map_t')
     (includes / 'pdfio_glyph_names.h').write_text('// Derived from PDFio pdf2text.c; Copyright 2022-2025 Michael R Sweet.\n// Apache-2.0; see build/deps/licenses/pdfio-LICENSE and pdfio-NOTICE.\n' + glyphs + '\n')
-    headers = [expat / 'lib/expat.h', expat / 'lib/expat_external.h', sources['md4c'] / 'src/md4c.h', pdfio / 'pdfio.h']
+    headers = [expat / 'lib/expat.h', expat / 'lib/expat_external.h', sources['md4c'] / 'src/md4c.h', sources['md4c'] / 'src/entity.h', pdfio / 'pdfio.h']
     headers += [sources['zlib'] / 'contrib/minizip' / name for name in ('ioapi.h', 'unzip.h', 'ints.h')]
     for header in headers:
         shutil.copyfile(header, includes / header.name)
