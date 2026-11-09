@@ -18,7 +18,8 @@ python3 tests/make_document_fixtures.py "$output/fixtures"
 python3 tests/make_text_fixtures.py "$output/fixtures"
 python3 tests/make_mobi_fixtures.py "$output/fixtures"
 python3 tests/make_package_fixtures.py "$output/fixtures"
-for suite in document formats mobi package; do
+python3 tests/make_legacy_fixtures.py "$output/fixtures"
+for suite in document formats mobi package legacy; do
     c++ -std=c++17 -DDSL_DOCUMENTS -DIOAPI_NO_64 -Wall -Wextra -Werror -g -fsanitize=address,undefined -Iinclude -Ibuild/deps-host/include -Isource/document source/document/*.cpp source/ioapi.c source/unzip.c "tests/${suite}_test.cpp" -Lbuild/deps-host/lib -lmd4c -lpdfio -lexpat -lmobi -lz -lm -o "$output/$suite-test"
     "$output/$suite-test" "$output/fixtures"
 done

@@ -206,7 +206,7 @@ public:
 int read_package(const char *path, format_t format, Sink &sink, Limits limits)
 {
     if (format != FORMAT_OPF && format != FORMAT_OEB_ZIP && format != FORMAT_HTML_ZIP
-        && format != FORMAT_TEXT_ZIP) return Unsupported;
+        && format != FORMAT_TEXT_ZIP && format != FORMAT_PML_ZIP) return Unsupported;
     bool archived = format != FORMAT_OPF;
     BookFiles files(path, archived, limits.input_bytes);
     if (files.status) return files.status;
@@ -218,6 +218,7 @@ int read_package(const char *path, format_t format, Sink &sink, Limits limits)
         for (const auto &name : files.entries()) {
             bool match = format == FORMAT_OEB_ZIP ? suffix(name, ".opf")
                 : format == FORMAT_HTML_ZIP ? html_name(name) && parent(name).empty()
+                : format == FORMAT_PML_ZIP ? suffix(name, ".pml")
                 : suffix(name, ".txt") || suffix(name, ".text") || suffix(name, ".md") || suffix(name, ".markdown");
             if (match) matches.push_back(name);
         }
@@ -230,6 +231,7 @@ int read_package(const char *path, format_t format, Sink &sink, Limits limits)
     int status = files.read(selected, data, format == FORMAT_OPF || format == FORMAT_OEB_ZIP
                             ? std::min(size_t(256*1024), limits.input_bytes) : entry_limit);
     if (status) return status;
+    if (format == FORMAT_PML_ZIP) return read_pml_data(data.data(), data.size(), sink, limits);
     if (format == FORMAT_TEXT_ZIP && document_format(selected.c_str()) == FORMAT_MARKDOWN) {
         Limits markdown = limits;
         size_t budget = limits.output_bytes <= 384*1024 ? 256*1024 : 1024*1024;

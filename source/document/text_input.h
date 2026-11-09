@@ -5,6 +5,7 @@
 namespace document {
 enum class Encoding { Utf8, Utf16LE, Utf16BE, Windows1252, Windows1251, Latin1 };
 int read_text_data(const char *data, size_t size, Sink &sink, Limits limits, Encoding encoding);
+int read_pml_data(const char *data, size_t size, Sink &sink, Limits limits);
 uint32_t decode_byte(unsigned char byte, Encoding encoding);
 
 // Bounded, incremental text decoding. A BOM takes precedence over a supplied encoding.

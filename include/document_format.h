@@ -3,7 +3,7 @@
 #include <string.h>
 #include <strings.h>
 
-enum format_t { FORMAT_UNDEF, FORMAT_XHTML, FORMAT_EPUB, FORMAT_TEXT, FORMAT_MARKDOWN, FORMAT_PDF, FORMAT_FB2, FORMAT_FB2_ZIP, FORMAT_RTF, FORMAT_DOCX, FORMAT_ODT, FORMAT_MOBI, FORMAT_OPF, FORMAT_OEB_ZIP, FORMAT_HTML_ZIP, FORMAT_TEXT_ZIP };
+enum format_t { FORMAT_UNDEF, FORMAT_XHTML, FORMAT_EPUB, FORMAT_TEXT, FORMAT_MARKDOWN, FORMAT_PDF, FORMAT_FB2, FORMAT_FB2_ZIP, FORMAT_RTF, FORMAT_DOCX, FORMAT_ODT, FORMAT_MOBI, FORMAT_OPF, FORMAT_OEB_ZIP, FORMAT_HTML_ZIP, FORMAT_TEXT_ZIP, FORMAT_PML, FORMAT_TCR, FORMAT_PML_ZIP };
 
 static inline format_t document_format(const char *filename)
 {
@@ -15,6 +15,9 @@ static inline format_t document_format(const char *filename)
     if (!ext) return FORMAT_UNDEF;
     if (!strcasecmp(ext, ".epub")) return FORMAT_EPUB;
 #ifdef DSL_DOCUMENTS
+    if (!strcasecmp(ext, ".pmlz")) return FORMAT_PML_ZIP;
+    if (!strcasecmp(ext, ".pml")) return FORMAT_PML;
+    if (!strcasecmp(ext, ".tcr")) return FORMAT_TCR;
     if (!strcasecmp(ext, ".opf") || !strcasecmp(ext, ".oeb")) return FORMAT_OPF;
     if (!strcasecmp(ext, ".oebzip")) return FORMAT_OEB_ZIP;
     if (!strcasecmp(ext, ".htmlz")) return FORMAT_HTML_ZIP;

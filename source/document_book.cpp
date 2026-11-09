@@ -45,7 +45,7 @@ int document_open_book(Book *book, const char *path)
     document::Layout layout(output, width, remaining / step + 1, limits);
     int status;
     if (book->format == FORMAT_OPF || book->format == FORMAT_OEB_ZIP
-        || book->format == FORMAT_HTML_ZIP || book->format == FORMAT_TEXT_ZIP)
+        || book->format == FORMAT_HTML_ZIP || book->format == FORMAT_TEXT_ZIP || book->format == FORMAT_PML_ZIP)
         status = document::read_package(path, book->format, layout, limits);
     else if (book->format == FORMAT_MOBI) status = document::read_mobi(path, layout, limits);
     else if (book->format == FORMAT_PDF) status = document::read_pdf(path, layout, limits);
@@ -57,6 +57,8 @@ int document_open_book(Book *book, const char *path)
         if (!file) return document::ReadError;
         if (book->format == FORMAT_MARKDOWN) status = document::read_markdown(file, layout, limits);
         else if (book->format == FORMAT_XHTML) status = document::read_html(file, layout, limits);
+        else if (book->format == FORMAT_PML) status = document::read_pml(file, layout, limits);
+        else if (book->format == FORMAT_TCR) status = document::read_tcr(file, layout, limits);
         else if (book->format == FORMAT_RTF) status = document::read_rtf(file, layout, limits);
         else status = document::read_text(file, layout, limits);
         fclose(file);
