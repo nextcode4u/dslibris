@@ -12,7 +12,7 @@ case-insensitive; directory names resembling books are skipped.
 | `.md`, `.markdown` | CommonMark text, headings, bold/italic, lists, code blocks, link labels, image alt text and simple table text |
 | `.pdf` | Extracted text reflowed into reader pages; no original page layout or image rendering |
 | `.html`, `.htm`, `.xhtml` | Local text, headings, basic emphasis, lists, code blocks and HTML entities |
-| `.fb2`, `.fb2.zip`, `.fbz` | FictionBook body text, headings, emphasis, verse and notes; ZIP stays in memory |
+| `.fb2`, `.fb2.zip`, `.fbz` | FictionBook body text, headings, emphasis, verse and notes; ZIP entries are read without extraction |
 | `.rtf` | Rich Text Format paragraphs, direct bold/italic, Unicode and Windows-1252/1251 text |
 | `.pdb`, `.prc`, `.mobi`, `.azw`, `.azw3` | PalmDOC or unencrypted Mobipocket/KF8 text, selected by container contents |
 | `.docx`, `.odt` | Main document text and simple table rows from the Office/OpenDocument ZIP |
@@ -154,5 +154,13 @@ normal builds. These are not physical-hardware tests.
 
 Local melonDS checks covered EPUB, TXT, Markdown and text/Unicode PDF reading in
 DS mode, plus Gloam-to-reader argv launches for EPUB, TXT, Markdown and compressed
-PDF text in DSi mode, using separate test SD images. Physical DS/DSi timing, SD-card behavior,
+PDF text in DSi mode. Additional DSi-mode Gloam argv checks opened small authored
+HTML, zipped FB2, RTF, DOCX, ODT, PalmDOC, MOBI and KF8/AZW3 files, including
+Windows-1252 KF8 text. A libmobi Huff/CDIC sample opened and allowed page turns
+and bookmarking; encrypted samples were rejected. A 300-book library check
+covered navigation beyond entry 255, XML-sensitive filenames, immediate bookmark
+saving and page/bookmark restoration after restarting. Native checks also exercised
+libmobi's KF8 skeleton/fragment samples. These used separate test SD images;
+fixtures, screenshots and third-party sample books are not repository contents.
+Physical DS/DSi timing, SD-card behavior,
 large-document peak memory and broader real-world PDF compatibility remain unverified.
