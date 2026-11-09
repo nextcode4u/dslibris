@@ -64,3 +64,6 @@ struct.pack_into('<H', data, central+8, 1)
 (root / 'Encrypted.txtz').write_bytes(data)
 
 archive('Markdown.txtz', {'index.md': '# MARKDOWN ZIP\n\n**bold** text Ω.'})
+
+archive('LargeMarkdown.txtz', {'book.md': 'x'*(256*1024+1)})
+archive('BigDirectory.htmlz', {'index.html': '<p>Readable</p>', **{'x'*440+str(i)+'.bin': b'' for i in range(300)}})

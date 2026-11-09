@@ -93,6 +93,8 @@ public:
         unz_global_info64 global{};
         if (unzGetGlobalInfo64(zip, &global) != UNZ_OK) { status = Invalid; return; }
         if (global.number_entry > 4096) { status = TooLarge; return; }
+        size_t name_bytes = 0;
+        size_t name_limit = std::min(budget, size_t(128*1024));
         int entry = unzGoToFirstFile(zip);
         for (; entry == UNZ_OK; entry = unzGoToNextFile(zip)) {
             unz_file_info64 info{};
@@ -100,6 +102,8 @@ public:
             if (unzGetCurrentFileInfo64(zip, &info, name, sizeof(name), nullptr, 0, nullptr, 0) != UNZ_OK) { status = Invalid; return; }
             if (info.size_filename >= sizeof(name)) { status = TooLarge; return; }
             if (strlen(name) != info.size_filename) { status = Invalid; return; }
+            if (info.size_filename+1 > name_limit-name_bytes) { status = TooLarge; return; }
+            name_bytes += info.size_filename+1;
             names.emplace_back(name);
         }
         if (entry != UNZ_END_OF_LIST_OF_FILE) status = Invalid;

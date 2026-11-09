@@ -50,6 +50,8 @@ int main(int argc, char **argv)
     Capture encrypted; assert(read("Encrypted.txtz",encrypted,limits) == document::Encrypted);
     Capture bounded; assert(read("Book.opf",bounded,{64,512,100}) == document::TooLarge);
     assert(read("Book.opf",bounded,{1024*1024,8,100}) == document::TooLarge);
+    assert(read("LargeMarkdown.txtz",bounded,{2*1024*1024,384*1024,1024}) == document::TooLarge);
+    assert(read("BigDirectory.htmlz",bounded,limits) == document::TooLarge);
     assert(document_format("Book.KEPUB") == FORMAT_EPUB);
     assert(document_format("Book.kepub.epub") == FORMAT_EPUB);
     assert(document_format("Notes.TEXT") == FORMAT_TEXT);
