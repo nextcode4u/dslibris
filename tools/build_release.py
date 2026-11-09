@@ -66,7 +66,13 @@ def build(tag, skip_build=False):
     notices.update({p.name: p.read_bytes() for p in (ROOT/'ports/notices').iterdir() if p.is_file()})
     for name, item in manifests.items():
         for notice in item['notices']:
-            notices[name+'-'+Path(notice).name] = (folders[name]/notice).read_bytes()
+            content = (folders[name]/notice).read_bytes()
+            # libmobi 0.12 ships an empty AUTHORS placeholder, not a notice.
+            if Path(notice).name == 'AUTHORS' and not content.strip():
+                continue
+            if not content.strip():
+                raise ValueError('Empty required runtime notice: '+name+'/'+notice)
+            notices[name+'-'+Path(notice).name] = content
     for notice in (folders['blocksds-sdk']/'sys/crts').glob('COPYING.*'):
         notices['blocksds-crts-'+notice.name] = notice.read_bytes()
     notices['ATTRIBUTION.md'] = (
