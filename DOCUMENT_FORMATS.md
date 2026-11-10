@@ -231,8 +231,8 @@ under AddressSanitizer/UndefinedBehaviorSanitizer; third-party libraries use the
 normal builds. These are not physical-hardware tests.
 
 Local melonDS checks covered EPUB, TXT, Markdown and text/Unicode PDF reading in
-DS mode, plus Gloam-to-reader argv launches for EPUB, TXT, Markdown and compressed
-PDF text in DSi mode. Additional DSi-mode Gloam argv checks opened small authored
+DS mode, plus launcher-to-reader argv launches for EPUB, TXT, Markdown and compressed
+PDF text in DSi mode. Additional DSi-mode argv checks opened small authored
 HTML, zipped FB2, RTF, DOCX, ODT, PalmDOC, MOBI and KF8/AZW3 files, including
 Windows-1252 KF8 text. OPF/OEB ZIP, HTMLZ, Markdown-in-TXTZ, PMLZ, TCR
 and `.kepub` argv launches were also exercised with local fixtures. A libmobi Huff/CDIC sample opened and allowed page turns

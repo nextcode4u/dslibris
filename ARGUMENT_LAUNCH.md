@@ -49,7 +49,7 @@ Required devkitPro libraries include libnds/libfat, nds-libexpat, nds-zlib,
 nds-bzip2 and nds-libpng; upstream also supplies its FreeType port. The output name
 comes from the checkout directory (for example `DSLibris.nds`). The original
 Makefile is unchanged. A full devkitARM/libnds 2 build and host tests passed locally;
-DS-mode reading and DSi-mode argv reading checks through Gloam passed for the
+DS-mode reading and DSi-mode argv reading checks passed for the
 BlocksDS build. Physical-console and broader launcher compatibility still need testing.
 
 ## Source changes
@@ -90,4 +90,5 @@ The source and assets inherited from upstream retain their original authors,
 credits and terms. New integration files are MIT-licensed as described in
 [ARGUMENT_LAUNCH_LICENSE.md](ARGUMENT_LAUNCH_LICENSE.md); this does not relicense the
 application or its dependencies. No game, book or separately supplied BIOS is
-added by this fork. No binary release has been published for this change.
+added by this fork. Development binaries and matching source are available in
+[this fork's releases](https://github.com/nextcode4u/dslibris/releases).
