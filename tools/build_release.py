@@ -84,7 +84,7 @@ def build(tag, skip_build=False):
         'Matching source and dependency archives accompany this release.\n'
         'Toolchain runtime provenance: ports/README.md in source.\n').encode()
     binary = (ROOT/'dslibris-blocksds.nds').read_bytes()
-    runtime = {'_nds/dsi-frontend/plugins/apps/dslibris-blocksds.nds': binary}
+    runtime = {'dslibris-blocksds.nds': binary}
     runtime.update({'data/dslibris/font/'+name: (folders['liberation-fonts']/name).read_bytes() for name in FONTS})
     source = {}
     tracked = subprocess.check_output(['git','ls-files','-z'],cwd=ROOT).decode().split('\0')

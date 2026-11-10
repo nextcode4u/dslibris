@@ -41,7 +41,9 @@ PDFio, libmobi and MiniZip headers, then builds the required libraries under ign
 `BLOCKSDS` and `WONDERFUL_TOOLCHAIN` for another installation. On Windows, use WSL
 or a supported BlocksDS development environment.
 
-The result is `dslibris-blocksds.nds`. The add-on installation uses
+The result is `dslibris-blocksds.nds`. Place it where your homebrew launcher
+expects applications and point any file associations to that location. Copy the
+release ZIP's `data/` directory to the SD root. The managed installation uses
 `data/dslibris/font/` and `media/books/`; new settings live in
 `data/dslibris/dslibris.xml`. An existing root `dslibris.xml` remains in use when
 there is no managed settings file, preserving its reading state and legacy fonts.
